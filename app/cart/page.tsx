@@ -15,10 +15,17 @@ export default function CartPage() {
     subtotalCents,
   } = useCart();
 
-  const SHIPPING_CENTS = 0;
-  const TAX_RATE = 0.08;
-  const taxCents = Math.round(subtotalCents * TAX_RATE);
-  const totalCents = subtotalCents + taxCents + SHIPPING_CENTS;
+const SHIPPING_CENTS = 0;
+const TAX_RATE = 0.08;
+const taxCents = Math.round(subtotalCents * TAX_RATE);
+const totalCents = subtotalCents + taxCents + SHIPPING_CENTS;
+
+function decrementButtonClass(qty: number): string {
+  const base =
+    "w-8 h-8 rounded-full border flex items-center justify-center transition-colors";
+  if (qty <= 1) return `${base} border-sage-dark/20 text-sage-dark/30 bg-background`;
+  return `${base} border-sage-dark/30 text-sage-dark hover:bg-cream-dark`;
+}
 
   return (
     <div className="flex flex-col flex-1">
@@ -27,7 +34,10 @@ export default function CartPage() {
           <h1 className="text-2xl font-bold text-foreground mb-8">Your Cart</h1>
 
           {items.length === 0 ? (
-            <div className="mx-auto max-w-2xl text-center">
+            <div className="mx-auto max-w-2xl text-center py-20">
+              <div className="w-20 h-20 rounded-full bg-cream-dark flex items-center justify-center mx-auto mb-4">
+                <ProductImage variant="hero" width={80} height={80} className="opacity-40" />
+              </div>
               <h2 className="text-3xl font-bold text-foreground mb-4">Your Cart</h2>
               <p className="text-sage-dark mb-8">Your cart is empty.</p>
               <Link
@@ -45,10 +55,10 @@ export default function CartPage() {
                     {items.map((item) => (
                       <div
                         key={`${item.productId}-${item.variantId}`}
-                        className="flex gap-4 items-center p-4 bg-background rounded-xl border border-cream-dark"
+                        className="flex gap-4 items-center p-4 bg-background rounded-xl border border-cream-dark hover:border-sage-dark/30 transition-colors"
                       >
-<div className="w-16 h-16 bg-cream-dark rounded-xl flex items-center justify-center text-sage-dark shrink-0">
-                      <ProductImage size="small" />
+                        <div className="w-16 h-16 bg-cream-dark rounded-xl flex items-center justify-center text-sage-dark shrink-0">
+                          <ProductImage variant="hero" width={48} height={48} className="opacity-60" />
                         </div>
                         <div className="flex-1">
                           <h3 className="font-semibold text-foreground">{item.variantName}</h3>
@@ -70,7 +80,8 @@ export default function CartPage() {
                                 item.quantity - 1
                               )
                             }
-                            className="w-8 h-8 rounded-full border border-sage-dark/30 flex items-center justify-center hover:bg-cream-dark text-sage-dark text-sm"
+                            disabled={item.quantity <= 1}
+                            className={decrementButtonClass(item.quantity)}
                           >
                             −
                           </button>
@@ -85,7 +96,7 @@ export default function CartPage() {
                                 item.quantity + 1
                               )
                             }
-                            className="w-8 h-8 rounded-full border border-sage-dark/30 flex items-center justify-center hover:bg-cream-dark text-sage-dark text-sm"
+                            className="w-8 h-8 rounded-full border flex items-center justify-center transition-colors border-sage-dark/30 text-sage-dark hover:bg-cream-dark"
                           >
                             +
                           </button>

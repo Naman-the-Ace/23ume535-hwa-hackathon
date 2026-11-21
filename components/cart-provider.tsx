@@ -22,6 +22,7 @@ type CartContextType = {
   isOpen: boolean;
   openCart: () => void;
   closeCart: () => void;
+  hydrated: boolean;
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -53,8 +54,10 @@ function validateStoredItems(raw: string): CartItem[] {
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [hydrated, setHydrated] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
+  // Hydrate from localStorage once on mount
   useEffect(() => {
     try {
       const raw = localStorage.getItem("sniffshift-cart");
@@ -64,16 +67,20 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       }
     } catch {
       // ignore malformed localStorage
+    } finally {
+      setHydrated(true);
     }
   }, []);
 
+  // Persist to localStorage only after hydration and when items change
   useEffect(() => {
+    if (!hydrated) return;
     try {
       localStorage.setItem("sniffshift-cart", JSON.stringify(items));
     } catch {
       // ignore quota errors
     }
-  }, [items]);
+  }, [items, hydrated]);
 
   const addItem = useCallback(
     (item: Omit<CartItem, "quantity"> & { quantity?: number }) => {
@@ -148,6 +155,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       isOpen,
       openCart,
       closeCart,
+      hydrated,
     }}>
       {children}
     </CartContext.Provider>

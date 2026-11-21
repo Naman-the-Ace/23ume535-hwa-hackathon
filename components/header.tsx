@@ -23,7 +23,7 @@ export function Header() {
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <Link href="/" className="flex items-center gap-2">
-              <ProductImage size="small" className="h-6 w-6" />
+              <ProductImage variant="hero" className="h-6 w-6" />
               <span className="text-coral font-bold tracking-tight">Sniff</span>
               <span className="text-sage-dark font-bold tracking-tight">Shift</span>
             </Link>

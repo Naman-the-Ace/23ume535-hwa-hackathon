@@ -33,27 +33,43 @@ export default function Home() {
   return (
     <div className="flex flex-col flex-1">
       <main className="flex-1">
-        <section className="py-20 px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-tight">
-            Delayed access. Real enrichment.
-          </h1>
-          <p className="mt-6 text-lg sm:text-xl text-sage-dark max-w-2xl mx-auto leading-relaxed">
-            SniffShift is a conceptual puzzle feeder that makes dogs work through
-            scent, shifting, and waiting. Presented as a prototype design.
-          </p>
-          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              href="/products/sniffshift-original"
-              className="flex-1 sm:w-auto px-8 py-4 rounded-full bg-coral text-white text-lg font-semibold hover:bg-coral-dark transition-colors shadow-lg shadow-coral/20"
-            >
-              Order SniffShift — $34
-            </Link>
-            <Link
-              href="#how-it-works"
-              className="flex-1 sm:w-auto px-8 py-4 rounded-full border border-sage-dark text-sage-dark text-lg font-semibold hover:bg-cream-dark transition-colors"
-            >
-              How it works
-            </Link>
+        <section className="py-24 px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-5xl">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div>
+                <span className="text-coral font-bold text-sm tracking-wider uppercase">
+                  Dog Enrichment
+                </span>
+                <h1 className="text-5xl sm:text-6xl font-bold tracking-tight text-foreground mb-6 leading-tight">
+                  Delayed access. Real enrichment.
+                </h1>
+                <p className="text-lg sm:text-xl text-sage-dark mb-8 max-w-lg leading-relaxed">
+                  SniffShift is a conceptual puzzle feeder that makes dogs work
+                  through scent, shifting, and waiting. Presented as a prototype
+                  design — not a finished product.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Link
+                    href="/products/sniffshift-original"
+                    className="flex-1 sm:w-auto px-8 py-4 rounded-full bg-coral text-white text-lg font-semibold hover:bg-coral-dark transition-colors shadow-lg shadow-coral/25"
+                  >
+                    Order SniffShift — $34
+                  </Link>
+                  <Link
+                    href="#how-it-works"
+                    className="flex-1 sm:w-auto px-8 py-4 rounded-full border border-sage-dark text-sage-dark text-lg font-semibold hover:bg-cream-dark transition-colors"
+                  >
+                    How it works
+                  </Link>
+                </div>
+              </div>
+              <div className="relative">
+                <div className="relative bg-sage/10 p-8 rounded-2xl border border-sage/20 text-center shadow-xl shadow-sage/10">
+                  <ProductImage variant="hero" width={320} height={320} className="mx-auto" />
+                  <div className="absolute -inset-1 bg-gradient-to-r from-coral/30 to-sage/30 rounded-2xl blur opacity-50"></div>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -71,9 +87,9 @@ export default function Home() {
               {product.mechanism.stages.map((stage) => (
                 <div
                   key={stage.number}
-                  className="flex flex-col items-center text-center p-6 bg-background rounded-2xl border border-cream-dark"
+                  className="flex flex-col items-center text-center p-6 bg-background rounded-2xl border border-cream-dark hover:border-coral/30 transition-colors"
                 >
-                  <div className="w-14 h-14 rounded-full bg-coral text-white flex items-center justify-center mb-6 text-xl font-mono">
+                  <div className="w-14 h-14 rounded-full bg-coral text-white flex items-center justify-center mb-6 text-xl font-mono shadow-md shadow-coral/20">
                     {stage.number}
                   </div>
                   <h3 className="font-bold text-foreground mb-2">{stage.title}</h3>
@@ -90,9 +106,8 @@ export default function Home() {
           <div className="mx-auto max-w-4xl">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div className="relative">
-                <div className="relative bg-sage/10 p-8 rounded-2xl border border-sage/20 text-center">
-                  <ProductImage size="large" />
-                  <div className="w-24 h-24 bg-white rounded-full mx-auto shadow-inner border-4 border-sage"></div>
+                <div className="relative bg-sage/10 p-8 rounded-2xl border border-sage/20 text-center shadow-lg shadow-sage/10">
+                  <ProductImage variant="detail" width={320} height={320} className="mx-auto" />
                 </div>
               </div>
               <div>
@@ -124,6 +139,28 @@ export default function Home() {
           </div>
         </section>
 
+        <section className="py-24 bg-cream-dark">
+          <div className="mx-auto max-w-4xl">
+            <div className="relative bg-sage/5 rounded-2xl border border-sage/20 p-8 sm:p-12 text-center shadow-lg shadow-sage/10">
+              <ProductImage variant="in-use" width={280} height={280} className="mx-auto mb-6" />
+              <h2 className="text-3xl font-bold text-foreground mb-4">
+                Designed for curious dogs
+              </h2>
+              <p className="text-sage-dark text-lg leading-relaxed mb-6 max-w-md mx-auto">
+                Every interaction with SniffShift is an opportunity for mental
+                stimulation. Your dog sniffs, shifts, and waits — turning
+                mealtime into enrichment.
+              </p>
+              <Link
+                href="/products/sniffshift-original"
+                className="inline-flex items-center justify-center gap-2 px-8 py-3 rounded-full bg-coral text-white text-base font-semibold hover:bg-coral-dark transition-colors shadow-lg shadow-coral/25"
+              >
+                View Product →
+              </Link>
+            </div>
+          </div>
+        </section>
+
         <section id="faq" className="py-24 bg-cream-dark">
           <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-center mb-12">
@@ -131,7 +168,7 @@ export default function Home() {
             </h2>
             <div className="space-y-4">
               {faqs.map((faq) => (
-                <div key={faq.q} className="bg-background p-6 rounded-xl border border-cream-dark">
+                <div key={faq.q} className="bg-background p-6 rounded-xl border border-cream-dark hover:border-sage-dark/30 transition-colors">
                   <h3 className="font-bold mb-2">{faq.q}</h3>
                   <p className="text-sage-dark text-sm">{faq.a}</p>
                 </div>

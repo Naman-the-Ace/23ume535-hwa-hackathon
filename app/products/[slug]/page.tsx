@@ -12,16 +12,25 @@ export default function ProductPage() {
   const [selectedVariant, setSelectedVariant] = useState<string>(
     product.variants[0].id
   );
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [selectedImageVariant, setSelectedImageVariant] = useState<
+    "hero" | "detail" | "in-use"
+  >("hero");
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
+  const [added, setAdded] = useState(false);
 
   const variant = product.variants.find((v) => v.id === selectedVariant);
   const priceCents = variant
     ? product.priceCents + variant.priceDelta
     : product.priceCents;
   const isInStock = variant ? variant.stock > 0 : false;
-  const mainImage = product.images[selectedImageIndex] ?? product.images[0];
+
+  function qtyButtonClass(disabled: boolean): string {
+    const base =
+      "w-10 h-10 rounded-full border flex items-center justify-center transition-colors";
+    if (disabled) return `${base} border-sage-dark/20 text-sage-dark/30 bg-background`;
+    return `${base} border-sage-dark/30 text-sage-dark hover:bg-cream-dark`;
+  }
 
   const handleAddToCart = useCallback(
     (e: FormEvent) => {
@@ -35,10 +44,20 @@ export default function ProductPage() {
         quantity,
         unitPriceCents: priceCents,
       });
-      setTimeout(() => setIsAdding(false), 800);
+      setAdded(true);
+      setTimeout(() => {
+        setIsAdding(false);
+        setAdded(false);
+      }, 1200);
     },
     [variant, isInStock, isAdding, addItem, quantity]
   );
+
+  const galleryImages = [
+    { variant: "hero" as const, label: "Front view of SniffShift device" },
+    { variant: "detail" as const, label: "Close-up of slider mechanism" },
+    { variant: "in-use" as const, label: "Dog interacting with SniffShift" },
+  ];
 
   return (
     <div className="flex flex-col flex-1">
@@ -52,24 +71,36 @@ export default function ProductPage() {
 
           <div className="grid lg:grid-cols-2 gap-12">
             <div className="space-y-6">
-              <div className="relative bg-cream-dark rounded-2xl overflow-hidden aspect-square flex items-center justify-center text-sage-dark">
-                <ProductImage size="large" />
+              {/* Main image */}
+              <div className="relative bg-cream-dark rounded-2xl overflow-hidden aspect-square flex items-center justify-center border border-cream-dark">
+                <ProductImage variant={selectedImageVariant} width={400} height={400} />
               </div>
 
+              {/* Gallery thumbnails */}
               <div className="flex gap-3 overflow-x-auto pb-2">
-                {product.images.map((img, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setSelectedImageIndex(idx)}
-                    className={`w-20 h-20 rounded-xl border flex-shrink-0 transition-colors flex items-center justify-center ${
-                      selectedImageIndex === idx
-                        ? "border-coral bg-coral/10"
-                        : "border-sage-dark/20 hover:border-coral"
-                    }`}
-                  >
-                    <ProductImage size="small" />
-                  </button>
-                ))}
+                {galleryImages.map((img, idx) => {
+                  const isActive = selectedImageVariant === img.variant;
+                  return (
+                    <button
+                      key={img.variant}
+                      onClick={() => setSelectedImageVariant(img.variant)}
+                      aria-label={img.label}
+                      aria-pressed={isActive}
+                      className={`w-20 h-20 rounded-xl border transition-all duration-200 flex items-center justify-center shrink-0 ${
+                        isActive
+                          ? "border-coral bg-coral/10 shadow-sm shadow-coral/10"
+                          : "border-sage-dark/20 hover:border-coral hover:bg-cream-dark"
+                      }`}
+                    >
+                      <ProductImage
+                        variant={img.variant}
+                        width={64}
+                        height={64}
+                        className={isActive ? "opacity-100" : "opacity-70"}
+                      />
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -83,6 +114,9 @@ export default function ProductPage() {
                 </h1>
                 <p className="text-lg text-sage-dark leading-relaxed">
                   {product.shortDescription}
+                </p>
+                <p className="mt-3 text-xs text-sage-dark/60 italic">
+                  Prototype concept — not a finished product
                 </p>
               </div>
 
@@ -107,6 +141,7 @@ export default function ProductPage() {
                     <button
                       key={v.id}
                       onClick={() => setSelectedVariant(v.id)}
+                      aria-pressed={selectedVariant === v.id}
                       className={`flex-1 py-3 rounded-xl border font-medium text-sm transition-all ${
                         selectedVariant === v.id
                           ? "bg-coral text-white border-coral shadow-md shadow-coral/20"
@@ -129,7 +164,8 @@ export default function ProductPage() {
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                    className="w-10 h-10 rounded-full border border-sage-dark/30 flex items-center justify-center hover:bg-cream-dark text-sage-dark"
+                    disabled={quantity <= 1}
+                    className={qtyButtonClass(quantity <= 1)}
                   >
                     −
                   </button>
@@ -144,10 +180,12 @@ export default function ProductPage() {
                     className="w-12 h-10 text-center border border-sage-dark/30 rounded-lg text-sage-dark focus:outline-none focus:ring-2 focus:ring-coral"
                     min="1"
                     max="10"
+                    readOnly
                   />
                   <button
                     onClick={() => setQuantity((q) => Math.min(10, q + 1))}
-                    className="w-10 h-10 rounded-full border border-sage-dark/30 flex items-center justify-center hover:bg-cream-dark text-sage-dark"
+                    disabled={quantity >= 10}
+                    className={qtyButtonClass(quantity >= 10)}
                   >
                     +
                   </button>
@@ -159,12 +197,23 @@ export default function ProductPage() {
                   type="submit"
                   variant="primary"
                   size="lg"
-                  className="w-full shadow-lg shadow-coral/20"
+                  className="w-full shadow-lg shadow-coral/20 transition-all"
                   isLoading={isAdding}
                   disabled={!isInStock || isAdding}
                 >
-                  {isAdding ? "Adding..." : "Add to Cart"}
+                  {added ? (
+                    <>Added to cart <span className="text-coral">✓</span></>
+                  ) : isAdding ? (
+                    "Adding…"
+                  ) : (
+                    "Add to Cart"
+                  )}
                 </Button>
+                {!isInStock && (
+                  <p className="mt-2 text-sm text-red-600">
+                    This variant is currently out of stock.
+                  </p>
+                )}
               </form>
             </div>
           </div>

@@ -69,7 +69,7 @@ export function CartDrawer() {
                   className="flex gap-4 items-center"
                 >
                   <div className="w-16 h-16 bg-cream-dark rounded-xl flex items-center justify-center text-sage-dark">
-                    <ProductImage size="small" />
+                    <ProductImage variant="hero" />
                   </div>
                   <div className="flex-1">
                     <div className="flex justify-between items-baseline">

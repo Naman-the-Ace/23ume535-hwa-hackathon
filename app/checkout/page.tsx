@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/components/cart-provider";
@@ -9,18 +9,10 @@ import { Button } from "@/components/button";
 const TAX_RATE = 0.08;
 const SHIPPING_CENTS = 0; // Free shipping
 
-const IDEMPOTENCY_KEY_STORAGE = "sniffshift-idempotency-key";
-
 type FormErrors = {
   customer?: Record<string, string>;
   shippingAddress?: Record<string, string>;
   general?: string;
-};
-
-type OrderSuccess = {
-  orderNumber: string;
-  orderId: string;
-  totalCents: number;
 };
 
 export default function CheckoutPage() {
@@ -34,25 +26,15 @@ export default function CheckoutPage() {
   const taxCents = Math.round(subtotalCents * TAX_RATE);
   const totalCents = subtotalCents + taxCents + SHIPPING_CENTS;
 
-  // Persist and reuse idempotency key so a retry of the same purchase
-  // hits the idempotency check instead of creating a duplicate order.
-  useEffect(() => {
-    const stored = sessionStorage.getItem(IDEMPOTENCY_KEY_STORAGE);
-    if (stored) {
-      idempotencyKeyRef.current = stored;
-    } else {
-      idempotencyKeyRef.current = `ss-${Date.now()}-${Math.random()
-        .toString(36)
-        .slice(2, 10)}`;
-      sessionStorage.setItem(IDEMPOTENCY_KEY_STORAGE, idempotencyKeyRef.current);
-    }
-  }, []);
+  // Initialize idempotency key once per checkout session
+  if (idempotencyKeyRef.current === null) {
+    idempotencyKeyRef.current = `ss-${Date.now()}-${Math.random()
+      .toString(36)
+      .slice(2, 10)}`;
+  }
 
   if (items.length === 0) {
-    if (typeof window !== "undefined") {
-      sessionStorage.removeItem(IDEMPOTENCY_KEY_STORAGE);
-      idempotencyKeyRef.current = null;
-    }
+    idempotencyKeyRef.current = null;
     return (
       <div className="flex flex-col flex-1">
         <header className="border-b border-cream-dark bg-background/95 sticky top-0 z-20 backdrop-blur-sm">
@@ -160,7 +142,6 @@ export default function CheckoutPage() {
 
         const data = await res.json();
         clear();
-        sessionStorage.removeItem(IDEMPOTENCY_KEY_STORAGE);
         idempotencyKeyRef.current = null;
         isSubmittingRef.current = false;
         setIsSubmitting(false);
