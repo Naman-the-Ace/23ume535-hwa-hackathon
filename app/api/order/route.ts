@@ -96,9 +96,17 @@ export async function POST(req: Request) {
       status: order.status,
     });
   } catch (err: any) {
+    // Distinguish client errors (400) from server errors (500).
+    // Validation errors from Zod are client errors; storage failures are server errors.
+    if (err.message?.includes("Validation error") || err.message?.includes("Invalid") || err.message?.includes("Insufficient")) {
+      return NextResponse.json(
+        { message: err.message || "Failed to create order" },
+        { status: 400 }
+      );
+    }
     return NextResponse.json(
-      { message: err.message || "Failed to create order" },
-      { status: 400 }
+      { message: "Internal server error. Please try again later." },
+      { status: 500 }
     );
   }
 }

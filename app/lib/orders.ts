@@ -51,10 +51,6 @@ function orderPath(orderId: string): string {
   return `${ORDERS_PREFIX}${orderId}.json`;
 }
 
-function orderPathByIdempotencyKey(key: string): string {
-  return `${ORDERS_PREFIX}${key}.json`;
-}
-
 export async function createOrder(input: CreateOrderInput): Promise<Order> {
   const id = generateOrderId();
   const now = new Date().toISOString();
@@ -74,14 +70,10 @@ export async function createOrder(input: CreateOrderInput): Promise<Order> {
     idempotencyKey: input.idempotencyKey,
   };
 
-  // Write to a deterministic path based on idempotency key if available,
-  // so concurrent requests with the same key write to the same file
-  // (last write wins, but the check-before-put in the API route handles dedup).
-  const path = input.idempotencyKey
-    ? orderPathByIdempotencyKey(input.idempotencyKey)
-    : orderPath(id);
-
-  await put(path, JSON.stringify(order, null, 2), {
+  // Always write to orderPath(orderId) so orders are retrievable by their
+  // order ID. The idempotency key is stored as metadata within the order
+  // object and used for duplicate detection before creation.
+  await put(orderPath(id), JSON.stringify(order, null, 2), {
     access: "private",
     contentType: "application/json",
   });
@@ -117,23 +109,6 @@ export async function getOrderByNumber(
 export async function getOrderByIdempotencyKey(
   key: string
 ): Promise<Order | null> {
-  try {
-    // First try deterministic path (atomic read for idempotency key)
-    const directResult = await get(orderPathByIdempotencyKey(key), {
-      access: "private",
-    });
-    if (directResult) {
-      const response = new Response(directResult.stream as any, {
-        headers: directResult.headers as any,
-      });
-      const json = (await response.json()) as Order;
-      return json;
-    }
-  } catch {
-    // File doesn't exist yet — fall through to listing
-  }
-
-  // Fallback: list all orders and search (for orders created before key-based paths)
   try {
     const orders = await listOrders();
     return orders.find((o) => o.idempotencyKey === key) || null;
