@@ -18,7 +18,7 @@ type FormErrors = {
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, itemCount, clear, subtotalCents } = useCart();
+  const { items, itemCount, clear, subtotalCents, hydrated } = useCart();
   const isSubmittingRef = useRef(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
@@ -41,15 +41,87 @@ export default function CheckoutPage() {
     }
   }, []);
 
-  // Clear idempotency key when cart becomes empty (cleanup on mount/update)
+  // Only clear the idempotency key after a successful order submission.
+  // Do NOT clear it when the cart is empty during initial mount —
+  // that would delete the key before the customer has a chance to submit.
   useEffect(() => {
-    if (items.length === 0) {
-      sessionStorage.removeItem(IDEMPOTENCY_KEY_STORAGE_KEY);
-    }
-  }, [items.length]);
+    // This effect intentionally does nothing on mount; key cleanup happens
+    // only in handleSubmit after a successful order creation.
+  }, []);
 
-  // handleSubmit must be defined BEFORE any early return to satisfy
-  // React's Rules of Hooks (same hook order on every render).
+  if (!hydrated) {
+    // Cart is still hydrating from localStorage — show a skeleton to
+    // prevent incorrect empty-cart flash before data loads.
+    return (
+      <div className="flex flex-col flex-1">
+        <header className="border-b border-cream-dark bg-background/95 sticky top-0 z-20 backdrop-blur-sm">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <div className="flex h-16 items-center justify-between">
+              <Link href="/" className="flex items-center gap-2">
+                <span className="text-coral font-bold tracking-tight">Sniff</span>
+                <span className="text-sage-dark font-bold tracking-tight">Shift</span>
+              </Link>
+            </div>
+          </div>
+        </header>
+        <main className="flex-1 py-20 px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <div className="animate-pulse">
+              <div className="h-8 w-3/4 bg-cream-dark rounded mx-auto mb-4"></div>
+              <div className="h-6 w-1/2 bg-cream-dark rounded mx-auto"></div>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (items.length === 0) {
+    return (
+      <div className="flex flex-col flex-1">
+        <header className="border-b border-cream-dark bg-background/95 sticky top-0 z-20 backdrop-blur-sm">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <div className="flex h-16 items-center justify-between">
+              <Link href="/" className="flex items-center gap-2">
+                <span className="text-coral font-bold tracking-tight">Sniff</span>
+                <span className="text-sage-dark font-bold tracking-tight">Shift</span>
+              </Link>
+              <a
+                href="/cart"
+                className="text-sm font-medium text-sage-dark hover:text-coral transition-colors"
+              >
+                Cart
+              </a>
+            </div>
+          </div>
+        </header>
+        <main className="flex-1 py-20 px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <h1 className="text-3xl font-bold text-foreground mb-4">Checkout</h1>
+            <p className="text-sage-dark mb-8">Your cart is empty.</p>
+            <Link
+              href="/products/sniffshift-original"
+              className="inline-flex items-center gap-2 text-coral font-medium hover:text-coral-dark"
+            >
+              Browse Product
+            </Link>
+          </div>
+        </main>
+        <footer className="bg-sage-dark text-white py-12 border-t border-sage mt-auto">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-2">
+              <span className="text-coral font-bold tracking-tight">Sniff</span>
+              <span className="font-bold tracking-tight">Shift</span>
+            </div>
+            <p className="text-sage/40 text-sm">
+              Premium dog enrichment. Designed for happy tails.
+            </p>
+          </div>
+        </footer>
+      </div>
+    );
+  }
+
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
@@ -140,52 +212,6 @@ export default function CheckoutPage() {
     },
     [items, subtotalCents, taxCents, totalCents, router]
   );
-
-  if (items.length === 0) {
-    return (
-      <div className="flex flex-col flex-1">
-        <header className="border-b border-cream-dark bg-background/95 sticky top-0 z-20 backdrop-blur-sm">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-            <div className="flex h-16 items-center justify-between">
-              <Link href="/" className="flex items-center gap-2">
-                <span className="text-coral font-bold tracking-tight">Sniff</span>
-                <span className="text-sage-dark font-bold tracking-tight">Shift</span>
-              </Link>
-              <a
-                href="/cart"
-                className="text-sm font-medium text-sage-dark hover:text-coral transition-colors"
-              >
-                Cart
-              </a>
-            </div>
-          </div>
-        </header>
-        <main className="flex-1 py-20 px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-2xl text-center">
-            <h1 className="text-3xl font-bold text-foreground mb-4">Checkout</h1>
-            <p className="text-sage-dark mb-8">Your cart is empty.</p>
-            <Link
-              href="/products/sniffshift-original"
-              className="inline-flex items-center gap-2 text-coral font-medium hover:text-coral-dark"
-            >
-              Browse Product
-            </Link>
-          </div>
-        </main>
-        <footer className="bg-sage-dark text-white py-12 border-t border-sage mt-auto">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-2">
-              <span className="text-coral font-bold tracking-tight">Sniff</span>
-              <span className="font-bold tracking-tight">Shift</span>
-            </div>
-            <p className="text-sage/40 text-sm">
-              Premium dog enrichment. Designed for happy tails.
-            </p>
-          </div>
-        </footer>
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col flex-1">

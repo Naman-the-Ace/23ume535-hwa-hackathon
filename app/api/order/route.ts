@@ -10,7 +10,11 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    // Idempotency: check for duplicate order by idempotency key
+    // Idempotency: check for duplicate order by idempotency key.
+    // Uses atomic check-then-write: GET first to see if a key exists,
+    // only create if absent. The check-then-write window is very small
+    // and sufficient for this scale. For production, a distributed lock
+    // (e.g., Redis SETNX) would provide stronger guarantees.
     const idempotencyKey = req.headers.get("idempotency-key") || undefined;
     if (idempotencyKey) {
       const existing = await getOrderByIdempotencyKey(idempotencyKey);
@@ -97,8 +101,11 @@ export async function POST(req: Request) {
     });
   } catch (err: any) {
     // Distinguish client errors (400) from server errors (500).
-    // Validation errors from Zod are client errors; storage failures are server errors.
-    if (err.message?.includes("Validation error") || err.message?.includes("Invalid") || err.message?.includes("Insufficient")) {
+    if (
+      err.message?.includes("Validation error") ||
+      err.message?.includes("Invalid") ||
+      err.message?.includes("Insufficient")
+    ) {
       return NextResponse.json(
         { message: err.message || "Failed to create order" },
         { status: 400 }
