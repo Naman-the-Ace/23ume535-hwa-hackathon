@@ -12,6 +12,7 @@ export default function ProductPage() {
   const [selectedVariant, setSelectedVariant] = useState<string>(
     product.variants[0].id
   );
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
 
@@ -20,6 +21,7 @@ export default function ProductPage() {
     ? product.priceCents + variant.priceDelta
     : product.priceCents;
   const isInStock = variant ? variant.stock > 0 : false;
+  const mainImage = product.images[selectedImageIndex] ?? product.images[0];
 
   const handleAddToCart = useCallback(
     (e: FormEvent) => {
@@ -58,8 +60,12 @@ export default function ProductPage() {
                 {product.images.map((img, idx) => (
                   <button
                     key={idx}
-                    onClick={() => {}}
-                    className="w-20 h-20 rounded-xl border border-sage-dark/20 flex-shrink-0 hover:border-coral transition-colors flex items-center justify-center"
+                    onClick={() => setSelectedImageIndex(idx)}
+                    className={`w-20 h-20 rounded-xl border flex-shrink-0 transition-colors flex items-center justify-center ${
+                      selectedImageIndex === idx
+                        ? "border-coral bg-coral/10"
+                        : "border-sage-dark/20 hover:border-coral"
+                    }`}
                   >
                     <ProductImage size="small" />
                   </button>

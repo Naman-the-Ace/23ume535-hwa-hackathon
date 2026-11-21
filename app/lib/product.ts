@@ -46,9 +46,9 @@ export const product: Product = {
   name: "SniffShift Enrichment Station",
   tagline: "Delayed-access puzzle feeding for dogs",
   description:
-    "SniffShift is a multi-stage enrichment station that uses delayed access to turn every meal into a problem-solving session. Your dog must sniff out the scent chamber, shift internal sliders to align the release path, and wait for the timed gate to open—extending feeding time and engaging natural foraging instincts.",
+    "SniffShift is a conceptual multi-stage enrichment station design. The proposed mechanism uses delayed access: a dog sniffs a scent chamber, shifts internal sliders with paws and nose, and waits for a release gate. Presented as a prototype; not a guaranteed solution for all dogs.",
   shortDescription:
-    "A delayed-access puzzle feeder that makes dogs work for their food through scent, shifting, and waiting.",
+    "A delayed-access puzzle feeder concept that makes dogs work through scent, shifting, and waiting.",
   priceCents: 3400,
   currency: "USD",
   category: "Dog Enrichment",
@@ -72,61 +72,60 @@ export const product: Product = {
     { id: "large", name: "Large", priceDelta: 1000, stock: 50 },
   ],
   specifications: {
-    "Primary function": "Delayed-access puzzle feeder",
-    "Stages": "3 (sniff, shift, wait)",
-    "Materials": "Food-safe polymer, silicone grip base",
-    "Dimensions": "18 cm x 12 cm x 7 cm",
-    "Weight": "280 g",
-    "Capacity": "Up to 1 cup of dry kibble or treats",
-    "Cleaning": "Hand wash with warm, soapy water",
+    "Primary function": "Delayed-access puzzle feeder (conceptual)",
+    "Stages": "3 (sniff, shift, wait) — proposed mechanism",
+    "Materials": "Food-safe polymer, silicone grip base (prototype target)",
+    "Dimensions": "18 cm x 12 cm x 7 cm (prototype target)",
+    "Weight": "280 g (prototype target)",
+    "Capacity": "Not yet verified (prototype)",
+    "Cleaning": "Hand wash with warm, soapy water recommended",
     "Sizes": "Small, Medium, Large",
   },
   features: [
-    "Delayed-access gate extends feeding time",
-    "Scent chamber engages natural foraging instincts",
-    "Slider mechanism requires paw and nose coordination",
-    "Non-slip silicone base stays in place during use",
-    "Three size options for different breeds",
+    "Proposed delayed-access release gate",
+    "Proposed scent chamber for treat concealment",
+    "Proposed slider mechanism for paw and nose interaction",
+    "Three size options proposed (Small, Medium, Large)",
   ],
   careInstructions: [
-    "Hand wash only with warm, soapy water",
+    "Hand wash only with warm, soapy water (recommended)",
     "Do not submerge in water or place in dishwasher",
     "Supervise your dog during initial introduction",
     "Remove if your dog shows signs of frustration",
     "Inspect regularly for wear and discontinue if damaged",
   ],
-  materials: ["Food-safe polymer", "Silicone grip base"],
+  materials: ["Food-safe polymer (prototype target)", "Silicone grip base (prototype target)"],
   isActive: true,
   mechanism: {
-    title: "How the delayed-access mechanism works",
+    title: "Proposed delayed-access mechanism",
     description:
-      "SniffShift doesn't give up treats immediately. Your dog works through three physical stages before food is released, turning a 30-second meal into a 10-minute enrichment session.",
+      "This is a conceptual design. The proposed mechanism would require a dog to work through three physical stages before food is released: sniffing a scent chamber, shifting internal gates with paws and nose, and waiting for timed release. Actual performance has not been verified.",
     stages: [
       {
         number: "01",
-        title: "Sniff & Locate",
+        title: "Sniff & Locate (proposed)",
         description:
-          "Your dog sniffs the scent chamber to locate the hidden kibble inside.",
-        action: "Scent detection",
+          "Proposed: dog sniffs the scent chamber to locate hidden kibble.",
+        action: "Scent detection (proposed)",
       },
       {
         number: "02",
-        title: "Shift & Align",
+        title: "Shift & Align (proposed)",
         description:
-          "Using paws and nose, your dog slides internal gates to align the release path.",
-        action: "Physical manipulation",
+          "Proposed: dog slides internal gates with paws and nose to align release path.",
+        action: "Physical manipulation (proposed)",
       },
       {
         number: "03",
-        title: "Wait & Release",
+        title: "Wait & Release (proposed)",
         description:
-          "The timed gate opens only after correct alignment, releasing a small portion.",
-        action: "Delayed gratification",
+          "Proposed: timed gate opens after correct alignment to release a portion.",
+        action: "Delayed gratification (proposed)",
       },
     ],
   },
   prototypeNote:
-    "Prototype disclosure: SniffShift is an early-stage prototype design. The images shown are conceptual representations. Functional specifications, materials, and performance may change before final production. Not a guaranteed solution for all dogs—some dogs may require additional training or may not engage with the delayed-access mechanism.",
+    "IMPORTANT: SniffShift is an early-stage prototype concept only. The images shown are conceptual representations, not photographs of a working product. Functional specifications, materials, dimensions, and performance are prototype targets that have not been verified or tested. This is not a guaranteed solution for all dogs. No purchase will be fulfilled—this is a demonstration storefront for a product concept.",
 };
 
 export function getVariantPriceCents(variantId: string): number {

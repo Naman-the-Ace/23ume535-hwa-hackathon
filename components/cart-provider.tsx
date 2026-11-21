@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { product } from "@/app/lib/product";
 
 export type CartItem = {
   productId: string;
@@ -25,6 +26,31 @@ type CartContextType = {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+function isValidCartItem(item: any): item is CartItem {
+  if (!item || typeof item !== "object") return false;
+  if (typeof item.productId !== "string" || item.productId !== product.id)
+    return false;
+  const variant = product.variants.find((v) => v.id === item.variantId);
+  if (!variant) return false;
+  if (typeof item.quantity !== "number" || item.quantity < 1 || item.quantity > 10)
+    return false;
+  const expectedPrice = product.priceCents + variant.priceDelta;
+  if (typeof item.unitPriceCents !== "number" || item.unitPriceCents !== expectedPrice)
+    return false;
+  if (typeof item.variantName !== "string") return false;
+  return true;
+}
+
+function validateStoredItems(raw: string): CartItem[] {
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(isValidCartItem);
+  } catch {
+    return [];
+  }
+}
+
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -33,8 +59,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     try {
       const raw = localStorage.getItem("sniffshift-cart");
       if (raw) {
-        const parsed = JSON.parse(raw) as CartItem[];
-        setItems(parsed);
+        const validItems = validateStoredItems(raw);
+        setItems(validItems);
       }
     } catch {
       // ignore malformed localStorage

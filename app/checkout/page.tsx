@@ -1,12 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCart } from "@/components/cart-provider";
 import { Button } from "@/components/button";
 
 const TAX_RATE = 0.08;
 const SHIPPING_CENTS = 0; // Free shipping
+
+const IDEMPOTENCY_KEY_STORAGE = "sniffshift-idempotency-key";
 
 type FormErrors = {
   customer?: Record<string, string>;
@@ -14,17 +17,42 @@ type FormErrors = {
   general?: string;
 };
 
+type OrderSuccess = {
+  orderNumber: string;
+  orderId: string;
+  totalCents: number;
+};
+
 export default function CheckoutPage() {
+  const router = useRouter();
   const { items, itemCount, clear, subtotalCents } = useCart();
+  const isSubmittingRef = useRef(false);
+  const idempotencyKeyRef = useRef<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
-  const [submitSuccess, setSubmitSuccess] = useState<{
-    orderNumber: string;
-    orderId: string;
-    totalCents: number;
-  } | null>(null);
+
+  const taxCents = Math.round(subtotalCents * TAX_RATE);
+  const totalCents = subtotalCents + taxCents + SHIPPING_CENTS;
+
+  // Persist and reuse idempotency key so a retry of the same purchase
+  // hits the idempotency check instead of creating a duplicate order.
+  useEffect(() => {
+    const stored = sessionStorage.getItem(IDEMPOTENCY_KEY_STORAGE);
+    if (stored) {
+      idempotencyKeyRef.current = stored;
+    } else {
+      idempotencyKeyRef.current = `ss-${Date.now()}-${Math.random()
+        .toString(36)
+        .slice(2, 10)}`;
+      sessionStorage.setItem(IDEMPOTENCY_KEY_STORAGE, idempotencyKeyRef.current);
+    }
+  }, []);
 
   if (items.length === 0) {
+    if (typeof window !== "undefined") {
+      sessionStorage.removeItem(IDEMPOTENCY_KEY_STORAGE);
+      idempotencyKeyRef.current = null;
+    }
     return (
       <div className="flex flex-col flex-1">
         <header className="border-b border-cream-dark bg-background/95 sticky top-0 z-20 backdrop-blur-sm">
@@ -70,148 +98,85 @@ export default function CheckoutPage() {
     );
   }
 
-  const taxCents = Math.round(subtotalCents * TAX_RATE);
-  const totalCents = subtotalCents + taxCents + SHIPPING_CENTS;
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
 
-  if (submitSuccess) {
-    return (
-      <div className="flex flex-col flex-1">
-        <header className="border-b border-cream-dark bg-background/95 sticky top-0 z-20 backdrop-blur-sm">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-            <div className="flex h-16 items-center justify-between">
-              <Link href="/" className="flex items-center gap-2">
-                <span className="text-coral font-bold tracking-tight">Sniff</span>
-                <span className="text-sage-dark font-bold tracking-tight">Shift</span>
-              </Link>
-            </div>
-          </div>
-        </header>
-        <main className="flex-1 py-20 px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-2xl text-center">
-            <div className="w-16 h-16 rounded-full bg-coral/10 flex items-center justify-center mx-auto mb-6">
-              <svg className="h-8 w-8 text-coral" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <h1 className="text-3xl font-bold text-foreground mb-4">Order Confirmed</h1>
-            <p className="text-sage-dark mb-6">
-              Thank you for your order! Your order reference is{" "}
-              <span className="font-bold text-coral">{submitSuccess.orderNumber}</span>.
-            </p>
-            <div className="p-6 bg-cream-dark rounded-2xl border border-cream-dark mb-8 text-left">
-              <h3 className="font-bold text-foreground mb-4">Order Summary</h3>
-              <div className="space-y-3 text-sage-dark text-sm">
-                <div className="flex justify-between">
-                  <span>Order #</span>
-                  <span className="font-medium">{submitSuccess.orderNumber}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Items ({itemCount})</span>
-                  <span className="font-medium">${(subtotalCents / 100).toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Tax</span>
-                  <span className="font-medium">${(taxCents / 100).toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Shipping</span>
-                  <span className="font-medium">Free</span>
-                </div>
-                <div className="flex justify-between pt-2 border-t border-sage-dark/20">
-                  <span className="font-bold">Total</span>
-                  <span className="font-bold text-coral">${(totalCents / 100).toFixed(2)}</span>
-                </div>
-              </div>
-            </div>
-            <Link
-              href="/"
-              className="inline-flex items-center gap-2 text-coral font-medium hover:text-coral-dark"
-            >
-              ← Return to Home
-            </Link>
-          </div>
-        </main>
-        <footer className="bg-sage-dark text-white py-12 border-t border-sage mt-auto">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-2">
-              <span className="text-coral font-bold tracking-tight">Sniff</span>
-              <span className="font-bold tracking-tight">Shift</span>
-            </div>
-            <p className="text-sage/40 text-sm">
-              Premium dog enrichment. Designed for happy tails.
-            </p>
-          </div>
-        </footer>
-      </div>
-    );
-  }
+      // Prevent simultaneous duplicate submissions
+      if (isSubmittingRef.current) return;
+      isSubmittingRef.current = true;
+      setIsSubmitting(true);
+      setErrors({});
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrors({});
-    setIsSubmitting(true);
+      const formData = new FormData(e.currentTarget as HTMLFormElement);
+      const customer = {
+        name: formData.get("name") as string,
+        email: formData.get("email") as string,
+        phone: formData.get("phone") as string,
+      };
+      const shippingAddress = {
+        line1: formData.get("line1") as string,
+        line2: formData.get("line2") as string || undefined,
+        city: formData.get("city") as string,
+        state: formData.get("state") as string,
+        postalCode: formData.get("postalCode") as string,
+        country: formData.get("country") as string,
+      };
 
-    const formData = new FormData(e.currentTarget as HTMLFormElement);
-    const customer = {
-      name: formData.get("name") as string,
-      email: formData.get("email") as string,
-      phone: formData.get("phone") as string,
-    };
-    const shippingAddress = {
-      line1: formData.get("line1") as string,
-      line2: formData.get("line2") as string || undefined,
-      city: formData.get("city") as string,
-      state: formData.get("state") as string,
-      postalCode: formData.get("postalCode") as string,
-      country: formData.get("country") as string,
-    };
+      const payload = {
+        customer,
+        shippingAddress,
+        items: items.map((i) => ({
+          productId: i.productId,
+          variantId: i.variantId,
+          quantity: i.quantity,
+          unitPriceCents: i.unitPriceCents,
+        })),
+        subtotalCents,
+        taxCents,
+        shippingCents: SHIPPING_CENTS,
+        totalCents,
+      };
 
-    const payload = {
-      customer,
-      shippingAddress,
-      items: items.map((i) => ({
-        productId: i.productId,
-        variantId: i.variantId,
-        quantity: i.quantity,
-        unitPriceCents: i.unitPriceCents,
-      })),
-      subtotalCents: subtotalCents,
-      taxCents,
-      shippingCents: SHIPPING_CENTS,
-      totalCents,
-    };
+      try {
+        const res = await fetch("/api/order", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "idempotency-key": idempotencyKeyRef.current!,
+          },
+          body: JSON.stringify(payload),
+        });
 
-    const idempotencyKey = `ss-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => ({}));
+          setErrors({
+            general: errorData.message || "Failed to place order. Please try again.",
+          });
+          isSubmittingRef.current = false;
+          setIsSubmitting(false);
+          return;
+        }
 
-    try {
-      const res = await fetch("/api/order", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "idempotency-key": idempotencyKey,
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        setErrors({ general: errorData.message || "Failed to place order. Please try again." });
+        const data = await res.json();
+        clear();
+        sessionStorage.removeItem(IDEMPOTENCY_KEY_STORAGE);
+        idempotencyKeyRef.current = null;
+        isSubmittingRef.current = false;
         setIsSubmitting(false);
-        return;
-      }
 
-      const data = await res.json();
-      clear();
-      setSubmitSuccess({
-        orderNumber: data.orderNumber,
-        orderId: data.id,
-        totalCents: data.totalCents,
-      });
-    } catch {
-      setErrors({ general: "An unexpected error occurred. Please try again." });
-      setIsSubmitting(false);
-    }
-  };
+        // Redirect to order confirmation — survives refresh
+        router.push(`/order/${data.id}`);
+      } catch {
+        setErrors({
+          general: "An unexpected error occurred. Please try again.",
+        });
+        isSubmittingRef.current = false;
+        setIsSubmitting(false);
+      }
+    },
+    [items, subtotalCents, taxCents, totalCents, router, idempotencyKeyRef]
+  );
 
   return (
     <div className="flex flex-col flex-1">
@@ -260,9 +225,9 @@ export default function CheckoutPage() {
                     </label>
                     <input
                       name="phone"
-                        type="tel"
-                        required
-                        className="w-full px-4 py-2 rounded-lg border border-sage-dark/30 bg-background text-sage-dark focus:outline-none focus:ring-2 focus:ring-coral"
+                      type="tel"
+                      required
+                      className="w-full px-4 py-2 rounded-lg border border-sage-dark/30 bg-background text-sage-dark focus:outline-none focus:ring-2 focus:ring-coral"
                     />
                     {errors.customer?.phone && (
                       <p className="text-xs text-red-600">{errors.customer.phone}</p>
@@ -372,7 +337,7 @@ export default function CheckoutPage() {
                   isLoading={isSubmitting}
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? "Placing Order..." : "Place Order — $34.00"}
+                  {isSubmitting ? "Placing Order..." : "Place Order"}
                 </Button>
               </form>
             </div>
