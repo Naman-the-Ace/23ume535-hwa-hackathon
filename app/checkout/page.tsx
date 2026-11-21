@@ -22,23 +22,22 @@ export default function CheckoutPage() {
   const isSubmittingRef = useRef(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
-  const [idempotencyKey, setIdempotencyKey] = useState<string | null>(null);
+  const idempotencyKeyRef = useRef<string | null>(null);
 
   const taxCents = Math.round(subtotalCents * TAX_RATE);
   const totalCents = subtotalCents + taxCents + SHIPPING_CENTS;
 
-  // Initialize idempotency key in sessionStorage once on mount.
+  // Initialize idempotency key once on client mount.
   // This key survives page refreshes during the same checkout session,
   // preventing duplicate orders if the customer refreshes after submitting.
   useEffect(() => {
-    if (typeof window === "undefined") return;
     const stored = sessionStorage.getItem(IDEMPOTENCY_KEY_STORAGE_KEY);
     if (!stored) {
       const newKey = `ss-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
       sessionStorage.setItem(IDEMPOTENCY_KEY_STORAGE_KEY, newKey);
-      setIdempotencyKey(newKey);
+      idempotencyKeyRef.current = newKey;
     } else {
-      setIdempotencyKey(stored);
+      idempotencyKeyRef.current = stored;
     }
   }, []);
 
@@ -136,7 +135,7 @@ export default function CheckoutPage() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "idempotency-key": idempotencyKey!,
+            "idempotency-key": idempotencyKeyRef.current!,
           },
           body: JSON.stringify(payload),
         });
@@ -179,7 +178,7 @@ export default function CheckoutPage() {
         setIsSubmitting(false);
       }
     },
-    [items, subtotalCents, taxCents, totalCents, router, idempotencyKey]
+    [items, subtotalCents, taxCents, totalCents, router]
   );
 
   return (

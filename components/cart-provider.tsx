@@ -84,6 +84,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const addItem = useCallback(
     (item: Omit<CartItem, "quantity"> & { quantity?: number }) => {
+      const quantity = Math.min(Math.max(item.quantity ?? 1, 1), 10);
       setItems((prev) => {
         const existing = prev.find(
           (i) => i.productId === item.productId && i.variantId === item.variantId
@@ -91,11 +92,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         if (existing) {
           return prev.map((i) =>
             i.productId === item.productId && i.variantId === item.variantId
-              ? { ...i, quantity: i.quantity + (item.quantity ?? 1) }
+              ? {
+                  ...i,
+                  quantity: Math.min(i.quantity + quantity, 10),
+                }
               : i
           );
         }
-        return [...prev, { ...item, quantity: item.quantity ?? 1 }];
+        return [...prev, { ...item, quantity }];
       });
       setIsOpen(true);
     },

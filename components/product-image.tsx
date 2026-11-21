@@ -62,11 +62,15 @@ export function ProductImage({
           <stop offset="0%" style={{ stopColor: "#9FB08A" }} />
           <stop offset="100%" style={{ stopColor: "#6B8A67" }} />
         </linearGradient>
+        <linearGradient id="bodyShade" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style={{ stopColor: "#E7E3D4", stopOpacity: 0.8 }} />
+          <stop offset="100%" style={{ stopColor: "#E7E3D4", stopOpacity: 0.4 }} />
+        </linearGradient>
         <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
-          <feDropShadow dx="0" dy="2" stdDeviation="4" flood-opacity="0.12" />
+          <feDropShadow dx="0" dy="3" stdDeviation="4" flood-opacity="0.15" />
         </filter>
         <filter id="innerShadow" x="-20%" y="-20%" width="140%" height="140%">
-          <feDropShadow dx="0" dy="1" stdDeviation="1" flood-opacity="0.3" />
+          <feDropShadow dx="0" dy="1" stdDeviation="1" flood-opacity="0.25" />
         </filter>
       </defs>
 
@@ -86,7 +90,7 @@ export function ProductImage({
             width="10"
             height="8"
             rx="2"
-            fill="#E7E3D4"
+            fill="url(#bodyShade)"
             stroke="#6B8A67"
             strokeWidth="1.5"
             filter="url(#dropShadow)"

@@ -56,6 +56,12 @@ export async function POST(req: Request) {
       if (!variant) {
         throw new Error(`Invalid variant: ${item.variantId}`);
       }
+      // Enforce quantity limit server-side (1-10)
+      if (item.quantity < 1 || item.quantity > 10) {
+        throw new Error(
+          `Invalid quantity for ${variant.name}: must be between 1 and 10`
+        );
+      }
       if (variant.stock < item.quantity) {
         throw new Error(`Insufficient stock for ${variant.name}`);
       }
