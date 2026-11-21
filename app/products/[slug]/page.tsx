@@ -204,44 +204,6 @@ export default function ProductPage() {
             </div>
           </section>
 
-          {/* 3-stage demonstration */}
-          <section id="how-it-works" className="mt-20 py-16 bg-cream-dark rounded-2xl border border-cream-dark/50">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-foreground mb-4">How It Works</h2>
-              <p className="text-sage-dark">Three simple stages, endless enrichment</p>
-            </div>
-            <div className="grid md:grid-cols-3 gap-8 px-4">
-              {[
-                {
-                  number: "01",
-                  title: "Sniff & Discover",
-                  desc: "Your dog investigates the new scent and texture, engaging natural curiosity.",
-                },
-                {
-                  number: "02",
-                  title: "Shift & Engage",
-                  desc: "Paws and nose work together to unlock the hidden treat inside.",
-                },
-                {
-                  number: "03",
-                  title: "Thrive & Relax",
-                  desc: "Mental stimulation leaves your dog satisfied, calm, and happy.",
-                },
-              ].map((stage) => (
-                <div
-                  key={stage.number}
-                  className="text-center p-6 bg-background rounded-xl border border-cream-dark"
-                >
-                  <div className="w-12 h-12 rounded-full bg-coral text-white flex items-center justify-center mx-auto mb-4 text-sm font-mono font-bold">
-                    {stage.number}
-                  </div>
-                  <h3 className="font-bold text-foreground mb-2">{stage.title}</h3>
-                  <p className="text-sage-dark text-sm leading-relaxed">{stage.desc}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-
           {/* Mechanism */}
           <section id="mechanism" className="mt-12">
             <h2 className="text-2xl font-bold text-foreground mb-6">
