@@ -1,0 +1,289 @@
+"use client";
+
+import Link from "next/link";
+import { useState, useCallback, FormEvent } from "react";
+import { product } from "@/app/lib/product";
+import { useCart } from "@/components/cart-provider";
+import { Button } from "@/components/button";
+
+export default function ProductPage() {
+  const { addItem } = useCart();
+  const [selectedVariant, setSelectedVariant] = useState<string>(
+    product.variants[0].id
+  );
+  const [quantity, setQuantity] = useState(1);
+  const [isAdding, setIsAdding] = useState(false);
+
+  const variant = product.variants.find((v) => v.id === selectedVariant);
+  const priceCents = variant
+    ? product.priceCents + variant.priceDelta
+    : product.priceCents;
+  const isInStock = variant ? variant.stock > 0 : false;
+
+  const handleAddToCart = useCallback(
+    (e: FormEvent) => {
+      e.preventDefault();
+      if (!variant || !isInStock || isAdding) return;
+      setIsAdding(true);
+      addItem({
+        productId: product.id,
+        variantId: variant.id,
+        variantName: variant.name,
+        quantity,
+      });
+      setTimeout(() => setIsAdding(false), 800);
+    },
+    [variant, isInStock, isAdding, addItem, quantity]
+  );
+
+  return (
+    <div className="flex flex-col flex-1">
+      <header className="border-b border-cream-dark bg-background/95 sticky top-0 z-20 backdrop-blur-sm">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 items-center justify-between">
+            <Link href="/" className="flex items-center gap-2">
+              <span className="text-coral font-bold tracking-tight">Sniff</span>
+              <span className="text-sage-dark font-bold tracking-tight">Shift</span>
+            </Link>
+            <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-sage-dark">
+              <Link href="/" className="text-foreground hover:text-coral transition-colors">
+                Home
+              </Link>
+              <Link href="#how-it-works" className="text-foreground hover:text-coral transition-colors">
+                How It Works
+              </Link>
+              <Link href="#faq" className="text-foreground hover:text-coral transition-colors">
+                FAQ
+              </Link>
+            </nav>
+          </div>
+        </div>
+      </header>
+
+      <main className="flex-1 py-8 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-5xl">
+          <nav className="mb-8 text-xs text-sage-dark">
+            <Link href="/" className="hover:text-coral transition-colors">Home</Link>
+            <span className="mx-1 text-sage-dark/50">/</span>
+            <span className="text-foreground">{product.name}</span>
+          </nav>
+
+          <div className="grid lg:grid-cols-2 gap-12">
+            <div className="space-y-6">
+              <div className="relative bg-cream-dark rounded-2xl overflow-hidden aspect-square flex items-center justify-center text-sage-dark">
+                <span className="text-6xl">🦴</span>
+              </div>
+
+              <div className="flex gap-3 overflow-x-auto pb-2">
+                {product.images.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => {}}
+                    className="w-20 h-20 rounded-xl border border-sage-dark/20 flex-shrink-0 hover:border-coral transition-colors flex items-center justify-center"
+                  >
+                    <span className="text-xl">🦴</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-8">
+              <div>
+                <span className="text-coral font-bold text-sm tracking-wider uppercase">
+                  Dog Enrichment
+                </span>
+                <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground mb-4">
+                  {product.name}
+                </h1>
+                <p className="text-lg text-sage-dark leading-relaxed">
+                  {product.shortDescription}
+                </p>
+              </div>
+
+              <div className="px-4 py-6 rounded-2xl border border-cream-dark bg-cream-dark/50">
+                <div className="flex items-baseline gap-3 mb-2">
+                  <span className="text-3xl font-bold text-foreground">
+                    ${(priceCents / 100).toFixed(2)}
+                  </span>
+                  <span className="text-sage-dark text-sm">USD</span>
+                </div>
+                <p className="text-sm text-sage-dark">
+                  Free shipping on all orders
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="font-bold text-foreground text-sm uppercase tracking-wider text-sage-dark">
+                  Size
+                </h3>
+                <div className="flex gap-3">
+                  {product.variants.map((v) => (
+                    <button
+                      key={v.id}
+                      onClick={() => setSelectedVariant(v.id)}
+                      className={`flex-1 py-3 rounded-xl border font-medium text-sm transition-all ${
+                        selectedVariant === v.id
+                          ? "bg-coral text-white border-coral shadow-md shadow-coral/20"
+                          : "bg-background text-sage-dark border-sage-dark/30 hover:border-sage-dark hover:bg-cream-dark"
+                      }`}
+                    >
+                      {v.name}
+                      {v.priceDelta > 0 && (
+                        <span className="text-xs ml-1 opacity-80">+${(v.priceDelta / 100).toFixed(2)}</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="font-bold text-foreground text-sm uppercase tracking-wider text-sage-dark">
+                  Quantity
+                </h3>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                    className="w-10 h-10 rounded-full border border-sage-dark/30 flex items-center justify-center hover:bg-cream-dark text-sage-dark"
+                  >
+                    −
+                  </button>
+                  <input
+                    type="number"
+                    value={quantity}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value, 10);
+                      if (!isNaN(val) && val >= 1 && val <= 10)
+                        setQuantity(val);
+                    }}
+                    className="w-12 h-10 text-center border border-sage-dark/30 rounded-lg text-sage-dark focus:outline-none focus:ring-2 focus:ring-coral"
+                    min="1"
+                    max="10"
+                  />
+                  <button
+                    onClick={() => setQuantity((q) => Math.min(10, q + 1))}
+                    className="w-10 h-10 rounded-full border border-sage-dark/30 flex items-center justify-center hover:bg-cream-dark text-sage-dark"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
+              <form onSubmit={handleAddToCart}>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="lg"
+                  className="w-full shadow-lg shadow-coral/20"
+                  isLoading={isAdding}
+                  disabled={!isInStock || isAdding}
+                >
+                  {isAdding ? "Adding..." : "Add to Cart"}
+                </Button>
+              </form>
+            </div>
+          </div>
+
+          {/* Product details */}
+          <section id="details" className="mt-16">
+            <h2 className="text-2xl font-bold text-foreground mb-6">Product Details</h2>
+            <p className="text-sage-dark leading-relaxed mb-6">
+              {product.description}
+            </p>
+
+            <div className="grid md:grid-cols-2 gap-8">
+              <div>
+                <h3 className="font-bold text-foreground mb-4">What's Included</h3>
+                <ul className="space-y-3 text-sage-dark">
+                  {product.features.map((f, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <span className="text-coral font-bold">✓</span>
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-bold text-foreground mb-4">Specifications</h3>
+                <table className="w-full text-left text-sage-dark text-sm">
+                  <tbody className="divide-y divide-cream-dark">
+                    {Object.entries(product.specifications).map(([key, value]) => (
+                      <tr key={key} className="py-3">
+                        <td className="font-medium text-sage-dark/70 w-1/3">{key}</td>
+                        <td className="text-foreground">{value}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          {/* 3-stage demonstration */}
+          <section id="how-it-works" className="mt-20 py-16 bg-cream-dark rounded-2xl border border-cream-dark/50">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-foreground mb-4">How It Works</h2>
+              <p className="text-sage-dark">Three simple stages, endless enrichment</p>
+            </div>
+            <div className="grid md:grid-cols-3 gap-8 px-4">
+              {[
+                {
+                  number: "01",
+                  title: "Sniff & Discover",
+                  desc: "Your dog investigates the new scent and texture, engaging natural curiosity.",
+                },
+                {
+                  number: "02",
+                  title: "Shift & Engage",
+                  desc: "Paws and nose work together to unlock the hidden treat inside.",
+                },
+                {
+                  number: "03",
+                  title: "Thrive & Relax",
+                  desc: "Mental stimulation leaves your dog satisfied, calm, and happy.",
+                },
+              ].map((stage) => (
+                <div
+                  key={stage.number}
+                  className="text-center p-6 bg-background rounded-xl border border-cream-dark"
+                >
+                  <div className="w-12 h-12 rounded-full bg-coral text-white flex items-center justify-center mx-auto mb-4 text-sm font-mono font-bold">
+                    {stage.number}
+                  </div>
+                  <h3 className="font-bold text-foreground mb-2">{stage.title}</h3>
+                  <p className="text-sage-dark text-sm leading-relaxed">{stage.desc}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Care instructions */}
+          <section id="care" className="mt-12">
+            <h2 className="text-2xl font-bold text-foreground mb-6">Care Instructions</h2>
+            <ul className="space-y-3 text-sage-dark list-disc pl-6">
+              {product.careInstructions.map((inst, i) => (
+                <li key={i}>{inst}</li>
+              ))}
+            </ul>
+          </section>
+        </div>
+      </main>
+
+      <footer className="bg-sage-dark text-white py-12 border-t border-sage mt-auto">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-2">
+            <span className="text-coral font-bold tracking-tight">Sniff</span>
+            <span className="font-bold tracking-tight">Shift</span>
+          </div>
+          <p className="text-sage/40 text-sm">
+            Premium dog enrichment. Designed for happy tails.
+          </p>
+          <div className="flex gap-4 text-sm text-sage/40">
+            <Link href="#" className="hover:text-white transition-colors">Privacy</Link>
+            <Link href="#" className="hover:text-white transition-colors">Terms</Link>
+            <Link href="#" className="hover:text-white transition-colors">Contact</Link>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
