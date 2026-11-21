@@ -3,19 +3,27 @@ import { randomBytes } from "crypto";
 import type { CheckoutInput, OrderStatus } from "./validation";
 import { ORDER_STATUS } from "./validation";
 
+export type OrderItem = {
+  productId: string;
+  variantId: string;
+  quantity: number;
+  unitPriceCents: number;
+};
+
 export type Order = {
   id: string;
   orderNumber: string;
   status: OrderStatus;
   customer: CheckoutInput["customer"];
   shippingAddress: CheckoutInput["shippingAddress"];
-  items: CheckoutInput["items"];
+  items: OrderItem[];
   subtotalCents: number;
   taxCents: number;
   shippingCents: number;
   totalCents: number;
   createdAt: string;
   updatedAt: string;
+  idempotencyKey?: string;
 };
 
 export type CreateOrderInput = CheckoutInput & {
@@ -23,6 +31,7 @@ export type CreateOrderInput = CheckoutInput & {
   taxCents: number;
   shippingCents: number;
   totalCents: number;
+  idempotencyKey?: string;
 };
 
 const ORDERS_PREFIX = "orders/";
@@ -58,6 +67,7 @@ export async function createOrder(input: CreateOrderInput): Promise<Order> {
     totalCents: input.totalCents,
     createdAt: now,
     updatedAt: now,
+    idempotencyKey: input.idempotencyKey,
   };
 
   await put(orderPath(id), JSON.stringify(order, null, 2), {
@@ -77,7 +87,17 @@ export async function getOrder(orderId: string): Promise<Order | null> {
     });
     const json = (await response.json()) as Order;
     return json;
-    return json;
+  } catch {
+    return null;
+  }
+}
+
+export async function getOrderByNumber(
+  orderNumber: string
+): Promise<Order | null> {
+  try {
+    const orders = await listOrders();
+    return orders.find((o) => o.orderNumber === orderNumber) || null;
   } catch {
     return null;
   }

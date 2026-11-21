@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { product } from "@/app/lib/product";
 import { useCart } from "@/components/cart-provider";
 import { Button } from "@/components/button";
+import { ProductImage } from "@/components/product-image";
 
 export default function CartPage() {
   const {
@@ -12,31 +12,16 @@ export default function CartPage() {
     removeItem,
     clear,
     itemCount,
+    subtotalCents,
   } = useCart();
 
-  const subtotal = items.reduce(
-    (sum, i) => sum + product.priceCents * i.quantity,
-    0
-  );
+  const SHIPPING_CENTS = 0;
+  const TAX_RATE = 0.08;
+  const taxCents = Math.round(subtotalCents * TAX_RATE);
+  const totalCents = subtotalCents + taxCents + SHIPPING_CENTS;
 
   return (
     <div className="flex flex-col flex-1">
-      <header className="border-b border-cream-dark bg-background/95 sticky top-0 z-20 backdrop-blur-sm">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
-            <Link href="/" className="flex items-center gap-2">
-              <span className="text-coral font-bold tracking-tight">Sniff</span>
-              <span className="text-sage-dark font-bold tracking-tight">Shift</span>
-            </Link>
-            <a
-              href="/cart"
-              className="text-sm font-medium text-sage-dark hover:text-coral transition-colors"
-            >
-              Cart ({itemCount})
-            </a>
-          </div>
-        </div>
-      </header>
       <main className="flex-1 py-8 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl">
           <h1 className="text-2xl font-bold text-foreground mb-8">Your Cart</h1>
@@ -62,8 +47,8 @@ export default function CartPage() {
                         key={`${item.productId}-${item.variantId}`}
                         className="flex gap-4 items-center p-4 bg-background rounded-xl border border-cream-dark"
                       >
-                        <div className="w-16 h-16 bg-cream-dark rounded-xl flex items-center justify-center text-sage-dark shrink-0">
-                          🦴
+<div className="w-16 h-16 bg-cream-dark rounded-xl flex items-center justify-center text-sage-dark shrink-0">
+                      <ProductImage size="small" />
                         </div>
                         <div className="flex-1">
                           <h3 className="font-semibold text-foreground">{item.variantName}</h3>
@@ -72,7 +57,7 @@ export default function CartPage() {
                           </p>
                           <div className="mt-2 flex items-end gap-2">
                             <span className="text-lg font-bold text-foreground">
-                              ${(product.priceCents * item.quantity / 100).toFixed(2)}
+                              ${(item.unitPriceCents * item.quantity / 100).toFixed(2)}
                             </span>
                           </div>
                         </div>
@@ -146,7 +131,7 @@ export default function CartPage() {
                           Subtotal ({itemCount} item{itemCount !== 1 ? "s" : ""})
                         </span>
                         <span className="font-medium text-foreground">
-                          ${(subtotal / 100).toFixed(2)}
+                          ${(subtotalCents / 100).toFixed(2)}
                         </span>
                       </div>
                       <div className="flex justify-between text-sm">
@@ -155,7 +140,7 @@ export default function CartPage() {
                       </div>
                       <div className="flex justify-between text-lg font-bold pt-2 border-t border-sage-dark/20">
                         <span className="text-foreground">Total</span>
-                        <span className="text-coral">${(subtotal / 100).toFixed(2)}</span>
+                        <span className="text-coral">${(totalCents / 100).toFixed(2)}</span>
                       </div>
                     </div>
                     <p className="text-xs text-sage-dark/60 text-center">

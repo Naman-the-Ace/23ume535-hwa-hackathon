@@ -5,6 +5,7 @@ import { useState, useCallback, FormEvent } from "react";
 import { product } from "@/app/lib/product";
 import { useCart } from "@/components/cart-provider";
 import { Button } from "@/components/button";
+import { ProductImage } from "@/components/product-image";
 
 export default function ProductPage() {
   const { addItem } = useCart();
@@ -30,6 +31,7 @@ export default function ProductPage() {
         variantId: variant.id,
         variantName: variant.name,
         quantity,
+        unitPriceCents: priceCents,
       });
       setTimeout(() => setIsAdding(false), 800);
     },
@@ -38,28 +40,6 @@ export default function ProductPage() {
 
   return (
     <div className="flex flex-col flex-1">
-      <header className="border-b border-cream-dark bg-background/95 sticky top-0 z-20 backdrop-blur-sm">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
-            <Link href="/" className="flex items-center gap-2">
-              <span className="text-coral font-bold tracking-tight">Sniff</span>
-              <span className="text-sage-dark font-bold tracking-tight">Shift</span>
-            </Link>
-            <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-sage-dark">
-              <Link href="/" className="text-foreground hover:text-coral transition-colors">
-                Home
-              </Link>
-              <Link href="#how-it-works" className="text-foreground hover:text-coral transition-colors">
-                How It Works
-              </Link>
-              <Link href="#faq" className="text-foreground hover:text-coral transition-colors">
-                FAQ
-              </Link>
-            </nav>
-          </div>
-        </div>
-      </header>
-
       <main className="flex-1 py-8 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl">
           <nav className="mb-8 text-xs text-sage-dark">
@@ -71,7 +51,7 @@ export default function ProductPage() {
           <div className="grid lg:grid-cols-2 gap-12">
             <div className="space-y-6">
               <div className="relative bg-cream-dark rounded-2xl overflow-hidden aspect-square flex items-center justify-center text-sage-dark">
-                <span className="text-6xl">🦴</span>
+                <ProductImage size="large" />
               </div>
 
               <div className="flex gap-3 overflow-x-auto pb-2">
@@ -81,7 +61,7 @@ export default function ProductPage() {
                     onClick={() => {}}
                     className="w-20 h-20 rounded-xl border border-sage-dark/20 flex-shrink-0 hover:border-coral transition-colors flex items-center justify-center"
                   >
-                    <span className="text-xl">🦴</span>
+                    <ProductImage size="small" />
                   </button>
                 ))}
               </div>
@@ -256,6 +236,33 @@ export default function ProductPage() {
             </div>
           </section>
 
+          {/* Mechanism */}
+          <section id="mechanism" className="mt-12">
+            <h2 className="text-2xl font-bold text-foreground mb-6">
+              {product.mechanism.title}
+            </h2>
+            <p className="text-sage-dark leading-relaxed mb-8">
+              {product.mechanism.description}
+            </p>
+            <div className="grid md:grid-cols-3 gap-6">
+              {product.mechanism.stages.map((stage) => (
+                <div
+                  key={stage.number}
+                  className="p-6 bg-cream-dark rounded-2xl border border-cream-dark text-center"
+                >
+                  <div className="w-12 h-12 rounded-full bg-coral text-white flex items-center justify-center mx-auto mb-4 text-sm font-mono font-bold">
+                    {stage.number}
+                  </div>
+                  <h3 className="font-bold text-foreground mb-2">{stage.title}</h3>
+                  <p className="text-sage-dark text-sm">{stage.description}</p>
+                  <p className="text-xs text-sage-dark/60 mt-2 font-mono">
+                    {stage.action}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+
           {/* Care instructions */}
           <section id="care" className="mt-12">
             <h2 className="text-2xl font-bold text-foreground mb-6">Care Instructions</h2>
@@ -264,6 +271,16 @@ export default function ProductPage() {
                 <li key={i}>{inst}</li>
               ))}
             </ul>
+          </section>
+
+          {/* Prototype disclosure */}
+          <section id="prototype" className="mt-12">
+            <div className="p-6 bg-sage-dark/10 rounded-2xl border border-sage-dark/30">
+              <h3 className="font-bold text-coral mb-2">Prototype Disclosure</h3>
+              <p className="text-sage-dark text-sm leading-relaxed">
+                {product.prototypeNote}
+              </p>
+            </div>
           </section>
         </div>
       </main>
@@ -278,9 +295,9 @@ export default function ProductPage() {
             Premium dog enrichment. Designed for happy tails.
           </p>
           <div className="flex gap-4 text-sm text-sage/40">
-            <Link href="#" className="hover:text-white transition-colors">Privacy</Link>
-            <Link href="#" className="hover:text-white transition-colors">Terms</Link>
-            <Link href="#" className="hover:text-white transition-colors">Contact</Link>
+            <a href="/#faq" className="hover:text-white transition-colors">FAQ</a>
+            <a href="/#care" className="hover:text-white transition-colors">Care</a>
+            <a href="/#prototype" className="hover:text-white transition-colors">Disclosure</a>
           </div>
         </div>
       </footer>

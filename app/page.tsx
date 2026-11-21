@@ -1,43 +1,31 @@
 import Link from "next/link";
-
-const stages = [
-  {
-    number: "01",
-    title: "Sniff & Discover",
-    description: "Your dog investigates the new scent and texture, engaging natural curiosity.",
-  },
-  {
-    number: "02",
-    title: "Shift & Engage",
-    description: "Paws and nose work together to unlock the hidden treat inside.",
-  },
-  {
-    number: "03",
-    title: "Thrive & Relax",
-    description: "Mental stimulation leaves your dog satisfied, calm, and happy.",
-  },
-];
+import { product } from "@/app/lib/product";
+import { ProductImage } from "@/components/product-image";
 
 const faqs = [
   {
     q: "What is SniffShift?",
-    a: "SniffShift is a single-product dog enrichment toy designed to turn mealtime into a mental workout. It engages your dog's natural foraging instincts with a hidden treat compartment.",
+    a: "SniffShift is a delayed-access enrichment station for dogs. It uses a three-stage mechanism—sniff, shift, wait—to turn mealtime into a problem-solving activity rather than instant gratification.",
   },
   {
-    q: "How does the 3-stage process work?",
-    a: "First, your dog sniffs and discovers the toy. Second, they shift and engage with their paws and nose to unlock treats. Third, they thrive and relax from the mental stimulation.",
+    q: "How does the three-stage process work?",
+    a: "First, your dog sniffs the scent chamber to locate food. Second, they shift internal sliders with their paws and nose to align the release path. Third, they wait for the timed gate to open, which delays access and extends feeding time.",
   },
   {
-    q: "Is it safe for all dog sizes?",
-    a: "Yes. SniffShift comes in Small, Medium, and Large variants and is suitable for all breeds and sizes. It's made from BPA-free, non-toxic, food-grade silicone.",
+    q: "Is SniffShift suitable for all dog sizes?",
+    a: "SniffShift comes in Small, Medium, and Large sizes. The right size depends on your dog's breed, snout length, and paw size. Supervise initial use to ensure your dog can engage with the mechanism.",
   },
   {
-    q: "How do I clean it?",
-    a: "SniffShift is dishwasher safe (top rack). You can also rinse it with warm water after each use. Inspect regularly for wear and replace if damaged.",
+    q: "How do I clean SniffShift?",
+    a: "Hand wash only with warm, soapy water. Do not place in the dishwasher or submerge in water. Dry thoroughly before reuse.",
   },
   {
-    q: "Do you offer free shipping?",
-    a: "Yes, all SniffShift orders ship free within the contiguous United States.",
+    q: "Is SniffShift a finished product?",
+    a: "No. SniffShift is an early-stage prototype. The images are conceptual representations, and specifications may change before final production. Some dogs may not engage with the delayed-access mechanism.",
+  },
+  {
+    q: "Does SniffShift slow down fast eaters?",
+    a: "The delayed-access design is intended to extend feeding time by requiring your dog to work through three stages before food is released. Results vary by dog—some may learn quickly, others may need more time or may not engage at all.",
   },
 ];
 
@@ -47,11 +35,11 @@ export default function Home() {
       <main className="flex-1">
         <section className="py-20 px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-tight">
-            Enrich every day.
+            Delayed access. Real enrichment.
           </h1>
           <p className="mt-6 text-lg sm:text-xl text-sage-dark max-w-2xl mx-auto leading-relaxed">
-            The single enrichment toy that turns mealtime into a mental workout. Designed for
-            curious dogs who love to sniff, shift, and solve.
+            SniffShift makes dogs work for their food through scent, shifting, and waiting.
+            A three-stage puzzle feeder that turns every meal into mental exercise.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
@@ -72,11 +60,15 @@ export default function Home() {
         <section id="how-it-works" className="py-24 bg-cream-dark">
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
-              <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">How it works</h2>
-              <p className="mt-4 text-sage-dark">Three simple stages, endless enrichment.</p>
+              <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">
+                How it works
+              </h2>
+              <p className="mt-4 text-sage-dark">
+                Three stages, delayed access, real engagement.
+              </p>
             </div>
             <div className="grid md:grid-cols-3 gap-8">
-              {stages.map((stage) => (
+              {product.mechanism.stages.map((stage) => (
                 <div
                   key={stage.number}
                   className="flex flex-col items-center text-center p-6 bg-background rounded-2xl border border-cream-dark"
@@ -85,7 +77,9 @@ export default function Home() {
                     {stage.number}
                   </div>
                   <h3 className="text-xl font-bold mb-2">{stage.title}</h3>
-                  <p className="text-sage-dark text-sm leading-relaxed">{stage.description}</p>
+                  <p className="text-sage-dark text-sm leading-relaxed">
+                    {stage.description}
+                  </p>
                 </div>
               ))}
             </div>
@@ -96,24 +90,26 @@ export default function Home() {
           <div className="mx-auto max-w-4xl">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div className="relative">
-                <div className="absolute inset-0 bg-coral/10 rounded-2xl blur-[80px]"></div>
                 <div className="relative bg-sage/10 p-8 rounded-2xl border border-sage/20 text-center">
-                  <div className="text-6xl mb-4">🦴</div>
+                  <ProductImage size="large" />
                   <div className="w-24 h-24 bg-white rounded-full mx-auto shadow-inner border-4 border-sage"></div>
                 </div>
               </div>
               <div>
-                <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">One toy. Every dog.</h2>
+                <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
+                  A puzzle feeder, not just a toy
+                </h2>
                 <p className="text-sage-dark text-lg leading-relaxed mb-6">
-                  SniffShift is crafted from durable, non-toxic materials with a hidden treat
-                  compartment that challenges your dog's mind and slows fast eating.
+                  SniffShift uses delayed access to extend feeding time and engage your
+                  dog's natural foraging instincts. No instant treats—your dog earns
+                  them through scent, shifting, and patience.
                 </p>
                 <ul className="space-y-3">
                   {[
-                    "Mental stimulation for bored pups",
-                    "Slows down fast eaters",
-                    "Easy to clean, dishwasher safe",
-                    "All sizes & breeds welcome",
+                    "Delayed-access gate extends feeding time",
+                    "Scent chamber engages foraging instincts",
+                    "Slider mechanism requires coordination",
+                    "Three sizes for different dogs",
                   ].map((feature) => (
                     <li key={feature} className="flex items-start gap-3">
                       <span className="text-coral font-bold">✓</span>
@@ -128,7 +124,9 @@ export default function Home() {
 
         <section id="faq" className="py-24 bg-cream-dark">
           <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-center mb-12">FAQ</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-center mb-12">
+              FAQ
+            </h2>
             <div className="space-y-4">
               {faqs.map((faq) => (
                 <div key={faq.q} className="bg-background p-6 rounded-xl border border-cream-dark">
@@ -142,7 +140,9 @@ export default function Home() {
 
         <section className="py-24 px-4 sm:px-6 lg:px-8 text-center">
           <div className="mx-auto max-w-2xl">
-            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">Ready to enrich?</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
+              Ready to enrich?
+            </h2>
             <p className="text-sage-dark mb-8">Order your SniffShift today.</p>
             <Link
               href="/products/sniffshift-original"
@@ -161,12 +161,12 @@ export default function Home() {
             <span className="font-bold tracking-tight">Shift</span>
           </div>
           <p className="text-sage/40 text-sm">
-            Premium dog enrichment. Designed for happy tails.
+            Delayed-access dog enrichment. Prototype stage.
           </p>
           <div className="flex gap-4 text-sm text-sage/40">
-            <a href="#" className="hover:text-white transition-colors">Privacy</a>
-            <a href="#" className="hover:text-white transition-colors">Terms</a>
-            <a href="#" className="hover:text-white transition-colors">Contact</a>
+            <a href="/#how-it-works" className="hover:text-white transition-colors">How It Works</a>
+            <a href="/#faq" className="hover:text-white transition-colors">FAQ</a>
+            <a href="/products/sniffshift-original#prototype" className="hover:text-white transition-colors">Disclosure</a>
           </div>
         </div>
       </footer>

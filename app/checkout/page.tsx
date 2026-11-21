@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useCart } from "@/components/cart-provider";
-import { product } from "@/app/lib/product";
 import { Button } from "@/components/button";
 
 const TAX_RATE = 0.08;
@@ -16,7 +15,7 @@ type FormErrors = {
 };
 
 export default function CheckoutPage() {
-  const { items, itemCount, clear } = useCart();
+  const { items, itemCount, clear, subtotalCents } = useCart();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitSuccess, setSubmitSuccess] = useState<{
@@ -71,12 +70,8 @@ export default function CheckoutPage() {
     );
   }
 
-  const subtotal = items.reduce(
-    (sum, i) => sum + product.priceCents * i.quantity,
-    0
-  );
-  const taxCents = Math.round(subtotal * TAX_RATE);
-  const totalCents = subtotal + taxCents + SHIPPING_CENTS;
+  const taxCents = Math.round(subtotalCents * TAX_RATE);
+  const totalCents = subtotalCents + taxCents + SHIPPING_CENTS;
 
   if (submitSuccess) {
     return (
@@ -112,7 +107,7 @@ export default function CheckoutPage() {
                 </div>
                 <div className="flex justify-between">
                   <span>Items ({itemCount})</span>
-                  <span className="font-medium">${(subtotal / 100).toFixed(2)}</span>
+                  <span className="font-medium">${(subtotalCents / 100).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Tax</span>
@@ -178,17 +173,23 @@ export default function CheckoutPage() {
         productId: i.productId,
         variantId: i.variantId,
         quantity: i.quantity,
+        unitPriceCents: i.unitPriceCents,
       })),
-      subtotalCents: subtotal,
+      subtotalCents: subtotalCents,
       taxCents,
       shippingCents: SHIPPING_CENTS,
       totalCents,
     };
 
+    const idempotencyKey = `ss-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+
     try {
       const res = await fetch("/api/order", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "idempotency-key": idempotencyKey,
+        },
         body: JSON.stringify(payload),
       });
 
@@ -214,22 +215,6 @@ export default function CheckoutPage() {
 
   return (
     <div className="flex flex-col flex-1">
-      <header className="border-b border-cream-dark bg-background/95 sticky top-0 z-20 backdrop-blur-sm">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
-            <Link href="/" className="flex items-center gap-2">
-              <span className="text-coral font-bold tracking-tight">Sniff</span>
-              <span className="text-sage-dark font-bold tracking-tight">Shift</span>
-            </Link>
-            <a
-              href="/cart"
-              className="text-sm font-medium text-sage-dark hover:text-coral transition-colors"
-            >
-              Cart ({itemCount})
-            </a>
-          </div>
-        </div>
-      </header>
       <main className="flex-1 py-8 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl">
           <h1 className="text-2xl font-bold text-foreground mb-8">Checkout</h1>
@@ -398,7 +383,7 @@ export default function CheckoutPage() {
                 <div className="space-y-3 mb-6">
                   <div className="flex justify-between text-sm">
                     <span className="text-sage-dark">Subtotal ({itemCount} item{itemCount !== 1 ? "s" : ""})</span>
-                    <span className="font-medium text-foreground">${(subtotal / 100).toFixed(2)}</span>
+                    <span className="font-medium text-foreground">${(subtotalCents / 100).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-sage-dark">Tax (8%)</span>

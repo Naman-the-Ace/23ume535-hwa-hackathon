@@ -3,7 +3,7 @@
 import { useCart } from "@/components/cart-provider";
 import { Button } from "@/components/button";
 import Link from "next/link";
-import { product } from "@/app/lib/product";
+import { ProductImage } from "@/components/product-image";
 
 export function CartDrawer() {
   const {
@@ -13,15 +13,16 @@ export function CartDrawer() {
     removeItem,
     updateQuantity,
     clear,
+    subtotalCents,
+    itemCount,
   } = useCart();
 
-  if (!isOpen) return null;
+  const SHIPPING_CENTS = 0;
+  const TAX_RATE = 0.08;
+  const taxCents = Math.round(subtotalCents * TAX_RATE);
+  const totalCents = subtotalCents + taxCents + SHIPPING_CENTS;
 
-  const subtotal = items.reduce(
-    (sum, i) => sum + product.priceCents * i.quantity,
-    0
-  );
-  const total = subtotal;
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end">
@@ -68,17 +69,12 @@ export function CartDrawer() {
                   className="flex gap-4 items-center"
                 >
                   <div className="w-16 h-16 bg-cream-dark rounded-xl flex items-center justify-center text-sage-dark">
-                    🦴
+                    <ProductImage size="small" />
                   </div>
                   <div className="flex-1">
                     <div className="flex justify-between items-baseline">
-                      <h3 className="font-semibold text-foreground">
-                        {item.variantName}
-                      </h3>
-                      <span className="text-sage-dark">${(
-                        (product.priceCents * item.quantity) /
-                        100
-                      ).toFixed(2)}</span>
+                      <h3 className="font-semibold text-foreground">{item.variantName}</h3>
+                      <span className="text-sage-dark">${(item.unitPriceCents * item.quantity / 100).toFixed(2)}</span>
                     </div>
                     <div className="flex items-center gap-3 mt-2">
                       <button
@@ -128,16 +124,16 @@ export function CartDrawer() {
             <div className="flex justify-between text-sm">
               <span className="text-sage-dark">Subtotal</span>
               <span className="font-medium text-foreground">
-                ${(subtotal / 100).toFixed(2)}
+                ${(subtotalCents / 100).toFixed(2)}
               </span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-sage-dark">Shipping</span>
               <span className="font-medium text-sage-dark">Free</span>
             </div>
-            <div className="flex justify-between text-lg font-bold">
+            <div className="flex justify-between text-lg font-bold pt-2 border-t border-sage-dark/20">
               <span className="text-foreground">Total</span>
-              <span className="text-coral">${(total / 100).toFixed(2)}</span>
+              <span className="text-coral">${(totalCents / 100).toFixed(2)}</span>
             </div>
           </div>
           {items.length > 0 ? (

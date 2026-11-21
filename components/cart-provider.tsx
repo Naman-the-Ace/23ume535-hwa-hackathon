@@ -1,4 +1,4 @@
-"use strict";
+"use client";
 
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
 
@@ -7,6 +7,7 @@ export type CartItem = {
   variantId: string;
   variantName: string;
   quantity: number;
+  unitPriceCents: number;
 };
 
 type CartContextType = {
@@ -16,6 +17,7 @@ type CartContextType = {
   updateQuantity: (productId: string, variantId: string, quantity: number) => void;
   clear: () => void;
   itemCount: number;
+  subtotalCents: number;
   isOpen: boolean;
   openCart: () => void;
   closeCart: () => void;
@@ -100,6 +102,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const itemCount = items.reduce((sum, i) => sum + i.quantity, 0);
+  const subtotalCents = items.reduce(
+    (sum, i) => sum + i.unitPriceCents * i.quantity,
+    0
+  );
 
   const openCart = () => setIsOpen(true);
   const closeCart = () => setIsOpen(false);
@@ -112,6 +118,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       updateQuantity,
       clear,
       itemCount,
+      subtotalCents,
       isOpen,
       openCart,
       closeCart,

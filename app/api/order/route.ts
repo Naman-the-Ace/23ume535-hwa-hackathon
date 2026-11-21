@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createOrder } from "@/app/lib/orders";
+import { createOrder, getOrderByNumber } from "@/app/lib/orders";
 import { checkoutSchema } from "@/app/lib/validation";
 import { product } from "@/app/lib/product";
 
@@ -10,15 +10,44 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
+    // Idempotency: check for duplicate order by idempotency key
+    const idempotencyKey = req.headers.get("idempotency-key") || undefined;
+    if (idempotencyKey) {
+      const existing = await getOrderByNumber(idempotencyKey);
+      if (existing) {
+        return NextResponse.json({
+          id: existing.id,
+          orderNumber: existing.orderNumber,
+          totalCents: existing.totalCents,
+          status: existing.status,
+          duplicate: true,
+        });
+      }
+    }
+
     const validated = checkoutSchema.safeParse(body);
     if (!validated.success) {
       return NextResponse.json(
-        { message: "Validation error", errors: validated.error.flatten() },
+        {
+          message: "Validation error",
+          errors: validated.error.flatten(),
+        },
         { status: 400 }
       );
     }
 
     const { customer, shippingAddress, items } = validated.data;
+
+    // Validate product ID
+    const invalidProductId = items.find(
+      (i) => i.productId !== product.id
+    );
+    if (invalidProductId) {
+      return NextResponse.json(
+        { message: `Invalid product ID: ${invalidProductId.productId}` },
+        { status: 400 }
+      );
+    }
 
     // Server-side price calculation — never trust client totals
     let subtotalCents = 0;
@@ -36,6 +65,7 @@ export async function POST(req: Request) {
         productId: item.productId,
         variantId: item.variantId,
         quantity: item.quantity,
+        unitPriceCents: variantPrice,
       };
     });
 
@@ -50,6 +80,7 @@ export async function POST(req: Request) {
       taxCents,
       shippingCents: SHIPPING_CENTS,
       totalCents,
+      idempotencyKey,
     });
 
     return NextResponse.json({

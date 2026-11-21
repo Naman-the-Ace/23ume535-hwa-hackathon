@@ -13,7 +13,7 @@ export default function OrderConfirmationClient() {
     status: string;
     totalCents: number;
     createdAt: string;
-    items: { productId: string; variantId: string; quantity: number }[];
+    items: { productId: string; variantId: string; quantity: number; unitPriceCents: number }[];
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -44,16 +44,6 @@ export default function OrderConfirmationClient() {
   if (loading) {
     return (
       <div className="flex flex-col flex-1">
-        <header className="border-b border-cream-dark bg-background/95 sticky top-0 z-20 backdrop-blur-sm">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-            <div className="flex h-16 items-center justify-between">
-              <Link href="/" className="flex items-center gap-2">
-                <span className="text-coral font-bold tracking-tight">Sniff</span>
-                <span className="text-sage-dark font-bold tracking-tight">Shift</span>
-              </Link>
-            </div>
-          </div>
-        </header>
         <main className="flex-1 py-20 px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <div className="animate-pulse">
@@ -97,16 +87,6 @@ export default function OrderConfirmationClient() {
 
   return (
     <div className="flex flex-col flex-1">
-      <header className="border-b border-cream-dark bg-background/95 sticky top-0 z-20 backdrop-blur-sm">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
-            <Link href="/" className="flex items-center gap-2">
-              <span className="text-coral font-bold tracking-tight">Sniff</span>
-              <span className="text-sage-dark font-bold tracking-tight">Shift</span>
-            </Link>
-          </div>
-        </div>
-      </header>
       <main className="flex-1 py-20 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
           <div className="w-16 h-16 rounded-full bg-coral/10 flex items-center justify-center mx-auto mb-6">
@@ -133,7 +113,7 @@ export default function OrderConfirmationClient() {
               <div className="flex justify-between">
                 <span>Items ({order.items.reduce((s, i) => s + i.quantity, 0)})</span>
                 <span className="font-medium">
-                  ${(order.items.reduce((s, i) => s + 34 * i.quantity, 0) / 100).toFixed(2)}
+                  ${(order.items.reduce((s, i) => s + i.unitPriceCents * i.quantity, 0) / 100).toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between pt-2 border-t border-sage-dark/20">

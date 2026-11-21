@@ -4,6 +4,7 @@ export const orderItemSchema = z.object({
   productId: z.string().min(1),
   variantId: z.string().min(1),
   quantity: z.number().int().min(1).max(10),
+  unitPriceCents: z.number().int().min(0),
 });
 
 export const customerSchema = z.object({
