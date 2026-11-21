@@ -36,7 +36,7 @@ export default function Home() {
         <section className="py-24 px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-5xl">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
-              <div>
+              <div className="animate-fade-in-up">
                 <span className="text-coral font-bold text-sm tracking-wider uppercase">
                   Dog Enrichment
                 </span>
@@ -51,19 +51,19 @@ export default function Home() {
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Link
                     href="/products/sniffshift-original"
-                    className="flex-1 sm:w-auto px-8 py-4 rounded-full bg-coral text-white text-lg font-semibold hover:bg-coral-dark transition-colors shadow-lg shadow-coral/25"
+                    className="flex-1 sm:w-auto px-8 py-4 rounded-full bg-coral text-white text-lg font-semibold hover:bg-coral-dark transition-all duration-300 shadow-lg shadow-coral/25"
                   >
                     Order SniffShift — $34
                   </Link>
                   <Link
                     href="#how-it-works"
-                    className="flex-1 sm:w-auto px-8 py-4 rounded-full border border-sage-dark text-sage-dark text-lg font-semibold hover:bg-cream-dark transition-colors"
+                    className="flex-1 sm:w-auto px-8 py-4 rounded-full border border-sage-dark text-sage-dark text-lg font-semibold hover:bg-cream-dark transition-all duration-300"
                   >
                     How it works
                   </Link>
                 </div>
               </div>
-              <div className="relative">
+              <div className="relative animate-fade-in-up" style={{ animationDelay: "200ms" }}>
                 <div className="relative bg-sage/10 p-8 rounded-2xl border border-sage/20 text-center shadow-xl shadow-sage/10">
                   <ProductImage variant="hero" width={320} height={320} className="mx-auto" />
                   <div className="absolute -inset-1 bg-gradient-to-r from-coral/30 to-sage/30 rounded-2xl blur opacity-50"></div>
@@ -84,10 +84,10 @@ export default function Home() {
               </p>
             </div>
             <div className="grid md:grid-cols-3 gap-8">
-              {product.mechanism.stages.map((stage) => (
+              {product.mechanism.stages.map((stage, idx) => (
                 <div
                   key={stage.number}
-                  className="flex flex-col items-center text-center p-6 bg-background rounded-2xl border border-cream-dark hover:border-coral/30 transition-colors"
+                  className={`flex flex-col items-center text-center p-6 bg-background rounded-2xl border border-cream-dark hover:border-coral/30 transition-all duration-300 animate-stage ${idx === 0 ? "animate-delay-100" : idx === 1 ? "animate-delay-200" : "animate-delay-300"}`}
                 >
                   <div className="w-14 h-14 rounded-full bg-coral text-white flex items-center justify-center mb-6 text-xl font-mono shadow-md shadow-coral/20">
                     {stage.number}
@@ -105,12 +105,12 @@ export default function Home() {
         <section className="py-24 px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-4xl">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
-              <div className="relative">
+              <div className="relative animate-fade-in-up" style={{ animationDelay: "100ms" }}>
                 <div className="relative bg-sage/10 p-8 rounded-2xl border border-sage/20 text-center shadow-lg shadow-sage/10">
                   <ProductImage variant="detail" width={320} height={320} className="mx-auto" />
                 </div>
               </div>
-              <div>
+              <div className="animate-fade-in-up" style={{ animationDelay: "300ms" }}>
                 <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
                   A puzzle feeder concept, not just a toy
                 </h2>
@@ -141,7 +141,7 @@ export default function Home() {
 
         <section className="py-24 bg-cream-dark">
           <div className="mx-auto max-w-4xl">
-            <div className="relative bg-sage/5 rounded-2xl border border-sage/20 p-8 sm:p-12 text-center shadow-lg shadow-sage/10">
+            <div className="relative bg-sage/5 rounded-2xl border border-sage/20 p-8 sm:p-12 text-center shadow-lg shadow-sage/10 animate-fade-in-up">
               <ProductImage variant="in-use" width={280} height={280} className="mx-auto mb-6" />
               <h2 className="text-3xl font-bold text-foreground mb-4">
                 Designed for curious dogs
@@ -153,7 +153,7 @@ export default function Home() {
               </p>
               <Link
                 href="/products/sniffshift-original"
-                className="inline-flex items-center justify-center gap-2 px-8 py-3 rounded-full bg-coral text-white text-base font-semibold hover:bg-coral-dark transition-colors shadow-lg shadow-coral/25"
+                className="inline-flex items-center justify-center gap-2 px-8 py-3 rounded-full bg-coral text-white text-base font-semibold hover:bg-coral-dark transition-all duration-300 shadow-lg shadow-coral/25"
               >
                 View Product →
               </Link>
@@ -168,7 +168,7 @@ export default function Home() {
             </h2>
             <div className="space-y-4">
               {faqs.map((faq) => (
-                <div key={faq.q} className="bg-background p-6 rounded-xl border border-cream-dark hover:border-sage-dark/30 transition-colors">
+                <div key={faq.q} className="bg-background p-6 rounded-xl border border-cream-dark hover:border-sage-dark/30 transition-all duration-300">
                   <h3 className="font-bold mb-2">{faq.q}</h3>
                   <p className="text-sage-dark text-sm">{faq.a}</p>
                 </div>
@@ -178,14 +178,14 @@ export default function Home() {
         </section>
 
         <section className="py-24 px-4 sm:px-6 lg:px-8 text-center">
-          <div className="mx-auto max-w-2xl">
+          <div className="mx-auto max-w-2xl animate-fade-in-up">
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
               Ready to enrich?
             </h2>
             <p className="text-sage-dark mb-8">Order your SniffShift today.</p>
             <Link
               href="/products/sniffshift-original"
-              className="inline-flex items-center justify-center gap-2 px-10 py-4 rounded-full bg-coral text-white text-lg font-semibold hover:bg-coral-dark transition-colors shadow-lg shadow-coral/25"
+              className="inline-flex items-center justify-center gap-2 px-10 py-4 rounded-full bg-coral text-white text-lg font-semibold hover:bg-coral-dark transition-all duration-300 shadow-lg shadow-coral/25"
             >
               Order SniffShift — $34
             </Link>

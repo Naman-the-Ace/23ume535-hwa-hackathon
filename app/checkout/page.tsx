@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/components/cart-provider";
@@ -8,6 +8,7 @@ import { Button } from "@/components/button";
 
 const TAX_RATE = 0.08;
 const SHIPPING_CENTS = 0; // Free shipping
+const IDEMPOTENCY_KEY_STORAGE_KEY = "sniffshift-idempotency-key";
 
 type FormErrors = {
   customer?: Record<string, string>;
@@ -19,22 +20,43 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { items, itemCount, clear, subtotalCents } = useCart();
   const isSubmittingRef = useRef(false);
-  const idempotencyKeyRef = useRef<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
 
   const taxCents = Math.round(subtotalCents * TAX_RATE);
   const totalCents = subtotalCents + taxCents + SHIPPING_CENTS;
 
-  // Initialize idempotency key once per checkout session
-  if (idempotencyKeyRef.current === null) {
-    idempotencyKeyRef.current = `ss-${Date.now()}-${Math.random()
-      .toString(36)
-      .slice(2, 10)}`;
-  }
+  // Persist idempotency key in sessionStorage so it survives page refreshes
+  // during the same checkout session. This prevents duplicate orders if the
+  // customer refreshes after submitting.
+  useEffect(() => {
+    const stored = sessionStorage.getItem(IDEMPOTENCY_KEY_STORAGE_KEY);
+    if (!stored) {
+      const newKey = `ss-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+      sessionStorage.setItem(IDEMPOTENCY_KEY_STORAGE_KEY, newKey);
+    }
+  }, []);
+
+  const [idempotencyKey, setIdempotencyKey] = useState<string | null>(null);
+
+  // Persist idempotency key in sessionStorage so it survives page refreshes
+  // during the same checkout session. This prevents duplicate orders if the
+  // customer refreshes after submitting.
+  useEffect(() => {
+    const stored = sessionStorage.getItem(IDEMPOTENCY_KEY_STORAGE_KEY);
+    if (!stored) {
+      const newKey = `ss-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+      sessionStorage.setItem(IDEMPOTENCY_KEY_STORAGE_KEY, newKey);
+      setIdempotencyKey(newKey);
+    } else {
+      setIdempotencyKey(stored);
+    }
+  }, []);
 
   if (items.length === 0) {
-    idempotencyKeyRef.current = null;
+    if (typeof window !== "undefined") {
+      sessionStorage.removeItem(IDEMPOTENCY_KEY_STORAGE_KEY);
+    }
     return (
       <div className="flex flex-col flex-1">
         <header className="border-b border-cream-dark bg-background/95 sticky top-0 z-20 backdrop-blur-sm">
@@ -125,13 +147,21 @@ export default function CheckoutPage() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "idempotency-key": idempotencyKeyRef.current!,
+            "idempotency-key": idempotencyKey!,
           },
           body: JSON.stringify(payload),
         });
 
         if (!res.ok) {
           const errorData = await res.json().catch(() => ({}));
+          // If we got a duplicate response, treat it as success and redirect
+          // to the existing order confirmation.
+          if (errorData.duplicate && errorData.id) {
+            clear();
+            sessionStorage.removeItem(IDEMPOTENCY_KEY_STORAGE_KEY);
+            router.push(`/order/${errorData.id}`);
+            return;
+          }
           setErrors({
             general: errorData.message || "Failed to place order. Please try again.",
           });
@@ -142,7 +172,7 @@ export default function CheckoutPage() {
 
         const data = await res.json();
         clear();
-        idempotencyKeyRef.current = null;
+        sessionStorage.removeItem(IDEMPOTENCY_KEY_STORAGE_KEY);
         isSubmittingRef.current = false;
         setIsSubmitting(false);
 
@@ -150,13 +180,13 @@ export default function CheckoutPage() {
         router.push(`/order/${data.id}`);
       } catch {
         setErrors({
-          general: "An unexpected error occurred. Please try again.",
+          general: "A network error occurred. Please check your connection and try again.",
         });
         isSubmittingRef.current = false;
         setIsSubmitting(false);
       }
     },
-    [items, subtotalCents, taxCents, totalCents, router, idempotencyKeyRef]
+    [items, subtotalCents, taxCents, totalCents, router, idempotencyKey]
   );
 
   return (
