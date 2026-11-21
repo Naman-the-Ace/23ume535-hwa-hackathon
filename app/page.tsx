@@ -5,15 +5,15 @@ import { ProductImage } from "@/components/product-image";
 const faqs = [
   {
     q: "What is SniffShift?",
-    a: "SniffShift is a delayed-access enrichment station for dogs. It uses a three-stage mechanism—sniff, shift, wait—to turn mealtime into a problem-solving activity rather than instant gratification.",
+    a: "SniffShift is a conceptual delayed-access enrichment station for dogs. It uses a proposed three-stage mechanism—sniff, shift, wait—to present a puzzle-feeding concept rather than instant treat access.",
   },
   {
     q: "How does the three-stage process work?",
-    a: "First, your dog sniffs the scent chamber to locate food. Second, they shift internal sliders with their paws and nose to align the release path. Third, they wait for the timed gate to open, which delays access and extends feeding time.",
+    a: "Proposed: first, your dog sniffs the scent chamber to locate food. Second, they shift internal sliders with their paws and nose to align the release path. Third, they wait for the timed gate to open, which delays access. Actual performance has not been verified.",
   },
   {
     q: "Is SniffShift suitable for all dog sizes?",
-    a: "SniffShift comes in Small, Medium, and Large sizes. The right size depends on your dog's breed, snout length, and paw size. Supervise initial use to ensure your dog can engage with the mechanism.",
+    a: "SniffShift comes in Small, Medium, and Large sizes as a prototype concept. The right size depends on your dog's breed, snout length, and paw size. Supervise initial use to ensure your dog can engage with the mechanism.",
   },
   {
     q: "How do I clean SniffShift?",
@@ -25,7 +25,7 @@ const faqs = [
   },
   {
     q: "Does SniffShift slow down fast eaters?",
-    a: "The delayed-access design is intended to extend feeding time by requiring your dog to work through three stages before food is released. Results vary by dog—some may learn quickly, others may need more time or may not engage at all.",
+    a: "The delayed-access design is proposed to extend feeding time by requiring your dog to work through three stages before food is released. Results vary by dog—some may learn quickly, others may need more time or may not engage at all. This has not been verified.",
   },
 ];
 
@@ -38,8 +38,8 @@ export default function Home() {
             Delayed access. Real enrichment.
           </h1>
           <p className="mt-6 text-lg sm:text-xl text-sage-dark max-w-2xl mx-auto leading-relaxed">
-            SniffShift makes dogs work for their food through scent, shifting, and waiting.
-            A three-stage puzzle feeder that turns every meal into mental exercise.
+            SniffShift is a conceptual puzzle feeder that makes dogs work through
+            scent, shifting, and waiting. Presented as a prototype design.
           </p>
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
@@ -64,7 +64,7 @@ export default function Home() {
                 How it works
               </h2>
               <p className="mt-4 text-sage-dark">
-                Three stages, delayed access, real engagement.
+                Three proposed stages, delayed access, conceptual engagement.
               </p>
             </div>
             <div className="grid md:grid-cols-3 gap-8">
@@ -76,7 +76,7 @@ export default function Home() {
                   <div className="w-14 h-14 rounded-full bg-coral text-white flex items-center justify-center mb-6 text-xl font-mono">
                     {stage.number}
                   </div>
-                  <h3 className="text-xl font-bold mb-2">{stage.title}</h3>
+                  <h3 className="font-bold text-foreground mb-2">{stage.title}</h3>
                   <p className="text-sage-dark text-sm leading-relaxed">
                     {stage.description}
                   </p>
@@ -97,19 +97,21 @@ export default function Home() {
               </div>
               <div>
                 <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-                  A puzzle feeder, not just a toy
+                  A puzzle feeder concept, not just a toy
                 </h2>
                 <p className="text-sage-dark text-lg leading-relaxed mb-6">
-                  SniffShift uses delayed access to extend feeding time and engage your
-                  dog's natural foraging instincts. No instant treats—your dog earns
-                  them through scent, shifting, and patience.
+                  SniffShift uses proposed delayed access to extend feeding time
+                  and engage your dog's natural foraging instincts. No instant
+                  treats—your dog earns them through scent, shifting, and patience.
+                  This is a conceptual design; actual performance has not been
+                  verified.
                 </p>
                 <ul className="space-y-3">
                   {[
-                    "Delayed-access gate extends feeding time",
-                    "Scent chamber engages foraging instincts",
-                    "Slider mechanism requires coordination",
-                    "Three sizes for different dogs",
+                    "Proposed delayed-access release gate",
+                    "Proposed scent chamber for treat concealment",
+                    "Proposed slider mechanism for paw and nose interaction",
+                    "Three size options proposed (Small, Medium, Large)",
                   ].map((feature) => (
                     <li key={feature} className="flex items-start gap-3">
                       <span className="text-coral font-bold">✓</span>
