@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createOrder, getOrderByNumber } from "@/app/lib/orders";
+import { createOrder, getOrderByIdempotencyKey } from "@/app/lib/orders";
 import { checkoutSchema } from "@/app/lib/validation";
 import { product } from "@/app/lib/product";
 
@@ -13,7 +13,7 @@ export async function POST(req: Request) {
     // Idempotency: check for duplicate order by idempotency key
     const idempotencyKey = req.headers.get("idempotency-key") || undefined;
     if (idempotencyKey) {
-      const existing = await getOrderByNumber(idempotencyKey);
+      const existing = await getOrderByIdempotencyKey(idempotencyKey);
       if (existing) {
         return NextResponse.json({
           id: existing.id,

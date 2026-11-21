@@ -103,6 +103,17 @@ export async function getOrderByNumber(
   }
 }
 
+export async function getOrderByIdempotencyKey(
+  key: string
+): Promise<Order | null> {
+  try {
+    const orders = await listOrders();
+    return orders.find((o) => o.idempotencyKey === key) || null;
+  } catch {
+    return null;
+  }
+}
+
 export async function listOrders(): Promise<Order[]> {
   const { blobs } = await list({ prefix: ORDERS_PREFIX });
   const orders: Order[] = [];
