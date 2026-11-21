@@ -22,27 +22,16 @@ export default function CheckoutPage() {
   const isSubmittingRef = useRef(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
+  const [idempotencyKey, setIdempotencyKey] = useState<string | null>(null);
 
   const taxCents = Math.round(subtotalCents * TAX_RATE);
   const totalCents = subtotalCents + taxCents + SHIPPING_CENTS;
 
-  // Persist idempotency key in sessionStorage so it survives page refreshes
-  // during the same checkout session. This prevents duplicate orders if the
-  // customer refreshes after submitting.
+  // Initialize idempotency key in sessionStorage once on mount.
+  // This key survives page refreshes during the same checkout session,
+  // preventing duplicate orders if the customer refreshes after submitting.
   useEffect(() => {
-    const stored = sessionStorage.getItem(IDEMPOTENCY_KEY_STORAGE_KEY);
-    if (!stored) {
-      const newKey = `ss-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-      sessionStorage.setItem(IDEMPOTENCY_KEY_STORAGE_KEY, newKey);
-    }
-  }, []);
-
-  const [idempotencyKey, setIdempotencyKey] = useState<string | null>(null);
-
-  // Persist idempotency key in sessionStorage so it survives page refreshes
-  // during the same checkout session. This prevents duplicate orders if the
-  // customer refreshes after submitting.
-  useEffect(() => {
+    if (typeof window === "undefined") return;
     const stored = sessionStorage.getItem(IDEMPOTENCY_KEY_STORAGE_KEY);
     if (!stored) {
       const newKey = `ss-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
@@ -158,7 +147,9 @@ export default function CheckoutPage() {
           // to the existing order confirmation.
           if (errorData.duplicate && errorData.id) {
             clear();
-            sessionStorage.removeItem(IDEMPOTENCY_KEY_STORAGE_KEY);
+            if (typeof window !== "undefined") {
+              sessionStorage.removeItem(IDEMPOTENCY_KEY_STORAGE_KEY);
+            }
             router.push(`/order/${errorData.id}`);
             return;
           }
@@ -172,7 +163,9 @@ export default function CheckoutPage() {
 
         const data = await res.json();
         clear();
-        sessionStorage.removeItem(IDEMPOTENCY_KEY_STORAGE_KEY);
+        if (typeof window !== "undefined") {
+          sessionStorage.removeItem(IDEMPOTENCY_KEY_STORAGE_KEY);
+        }
         isSubmittingRef.current = false;
         setIsSubmitting(false);
 
@@ -348,7 +341,7 @@ export default function CheckoutPage() {
                   isLoading={isSubmitting}
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? "Placing Order..." : "Place Order"}
+                  {isSubmitting ? "Placing Order…" : "Place Order"}
                 </Button>
               </form>
             </div>
@@ -373,10 +366,6 @@ export default function CheckoutPage() {
                     <span className="text-foreground">Total</span>
                     <span className="text-coral">${(totalCents / 100).toFixed(2)}</span>
                   </div>
-                </div>
-                <div className="text-xs text-sage-dark/60">
-                  <p>Your order will be processed securely.</p>
-                  <p>You'll receive an order confirmation email shortly.</p>
                 </div>
               </div>
             </div>

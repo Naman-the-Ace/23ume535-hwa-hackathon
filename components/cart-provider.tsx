@@ -119,10 +119,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         removeItem(productId, variantId);
         return;
       }
+      // Enforce quantity limit of 10
+      const boundedQty = Math.min(quantity, 10);
       setItems((prev) =>
         prev.map((i) =>
           i.productId === productId && i.variantId === variantId
-            ? { ...i, quantity }
+            ? { ...i, quantity: boundedQty }
             : i
         )
       );
