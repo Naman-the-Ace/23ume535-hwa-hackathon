@@ -27,18 +27,26 @@ type CartContextType = {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-function isValidCartItem(item: any): item is CartItem {
+function isValidCartItem(item: unknown): item is CartItem {
   if (!item || typeof item !== "object") return false;
-  if (typeof item.productId !== "string" || item.productId !== product.id)
+  const candidate = item as Partial<CartItem>;
+  if (typeof candidate.productId !== "string" || candidate.productId !== product.id)
     return false;
-  const variant = product.variants.find((v) => v.id === item.variantId);
+  const variant = product.variants.find((v) => v.id === candidate.variantId);
   if (!variant) return false;
-  if (typeof item.quantity !== "number" || item.quantity < 1 || item.quantity > 10)
+  if (
+    typeof candidate.quantity !== "number" ||
+    candidate.quantity < 1 ||
+    candidate.quantity > 10
+  )
     return false;
   const expectedPrice = product.priceCents + variant.priceDelta;
-  if (typeof item.unitPriceCents !== "number" || item.unitPriceCents !== expectedPrice)
+  if (
+    typeof candidate.unitPriceCents !== "number" ||
+    candidate.unitPriceCents !== expectedPrice
+  )
     return false;
-  if (typeof item.variantName !== "string") return false;
+  if (typeof candidate.variantName !== "string") return false;
   return true;
 }
 
@@ -59,17 +67,24 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   // Hydrate from localStorage once on mount
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem("sniffshift-cart");
-      if (raw) {
-        const validItems = validateStoredItems(raw);
-        setItems(validItems);
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      try {
+        const raw = localStorage.getItem("sniffshift-cart");
+        if (raw) {
+          const validItems = validateStoredItems(raw);
+          setItems(validItems);
+        }
+      } catch {
+        // ignore malformed localStorage
+      } finally {
+        setHydrated(true);
       }
-    } catch {
-      // ignore malformed localStorage
-    } finally {
-      setHydrated(true);
-    }
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Persist to localStorage only after hydration and when items change

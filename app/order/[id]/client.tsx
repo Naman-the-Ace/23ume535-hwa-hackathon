@@ -2,11 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 
 export default function OrderConfirmationClient() {
   const params = useParams();
-  const router = useRouter();
   const [order, setOrder] = useState<{
     id: string;
     orderNumber: string;
@@ -20,30 +19,47 @@ export default function OrderConfirmationClient() {
 
   useEffect(() => {
     const id = (params as { id: string }).id;
+    let cancelled = false;
     fetch(`/api/order/${id}`)
-      .then((res) => {
+      .then(async (res) => {
         if (res.status === 404) {
-          setNotFound(true);
-          setLoading(false);
-          return;
+          if (!cancelled) {
+            setNotFound(true);
+            setLoading(false);
+          }
+          return null;
         }
+        if (!res.ok) throw new Error("Failed to load order");
         return res.json();
       })
       .then((data) => {
-        if (data && !notFound) {
-          setOrder(data);
-        }
+        if (cancelled) return;
+        if (data) setOrder(data);
         setLoading(false);
       })
       .catch(() => {
+        if (cancelled) return;
         setNotFound(true);
         setLoading(false);
       });
+    return () => {
+      cancelled = true;
+    };
   }, [params]);
 
   if (loading) {
     return (
       <div className="flex flex-col flex-1">
+        <header className="border-b border-cream-dark bg-background/95 sticky top-0 z-20 backdrop-blur-sm">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <div className="flex h-16 items-center justify-between">
+              <Link href="/" className="flex items-center gap-2">
+                <span className="text-coral font-bold tracking-tight">Sniff</span>
+                <span className="text-sage-dark font-bold tracking-tight">Shift</span>
+              </Link>
+            </div>
+          </div>
+        </header>
         <main className="flex-1 py-20 px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <div className="animate-pulse">
@@ -72,7 +88,7 @@ export default function OrderConfirmationClient() {
         <main className="flex-1 py-20 px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">
             <h1 className="text-3xl font-bold text-foreground mb-4">Order Not Found</h1>
-            <p className="text-sage-dark mb-8">The order you're looking for doesn't exist.</p>
+            <p className="text-sage-dark mb-8">The order you&apos;re looking for doesn&apos;t exist.</p>
             <Link
               href="/"
               className="inline-flex items-center gap-2 text-coral font-medium hover:text-coral-dark"
@@ -87,6 +103,16 @@ export default function OrderConfirmationClient() {
 
   return (
     <div className="flex flex-col flex-1">
+      <header className="border-b border-cream-dark bg-background/95 sticky top-0 z-20 backdrop-blur-sm">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 items-center justify-between">
+            <Link href="/" className="flex items-center gap-2">
+              <span className="text-coral font-bold tracking-tight">Sniff</span>
+              <span className="text-sage-dark font-bold tracking-tight">Shift</span>
+            </Link>
+          </div>
+        </div>
+      </header>
       <main className="flex-1 py-20 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
           <div className="w-16 h-16 rounded-full bg-coral/10 flex items-center justify-center mx-auto mb-6">

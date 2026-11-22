@@ -50,7 +50,7 @@ export default function ProductPage() {
         setAdded(false);
       }, 1200);
     },
-    [variant, isInStock, isAdding, addItem, quantity]
+    [variant, isInStock, isAdding, addItem, quantity, priceCents]
   );
 
   const galleryImages = [
@@ -69,7 +69,7 @@ export default function ProductPage() {
             <span className="text-foreground">{product.name}</span>
           </nav>
 
-          <div className="grid lg:grid-cols-2 gap-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             <div className="space-y-6">
               {/* Main image */}
               <div className="relative bg-cream-dark rounded-2xl overflow-hidden aspect-square flex items-center justify-center border border-cream-dark">
@@ -78,7 +78,7 @@ export default function ProductPage() {
 
               {/* Gallery thumbnails */}
               <div className="flex gap-3 overflow-x-auto pb-2">
-                {galleryImages.map((img, idx) => {
+                {galleryImages.map((img) => {
                   const isActive = selectedImageVariant === img.variant;
                   return (
                     <button
@@ -227,7 +227,7 @@ export default function ProductPage() {
 
             <div className="grid md:grid-cols-2 gap-8">
               <div>
-                <h3 className="font-bold text-foreground mb-4">What's Included</h3>
+                <h3 className="font-bold text-foreground mb-4">What&apos;s Included</h3>
                 <ul className="space-y-3 text-sage-dark">
                   {product.features.map((f, i) => (
                     <li key={i} className="flex items-start gap-3">
@@ -312,9 +312,9 @@ export default function ProductPage() {
             Premium dog enrichment. Designed for happy tails.
           </p>
           <div className="flex gap-4 text-sm text-sage/40">
-            <a href="/#faq" className="hover:text-white transition-colors">FAQ</a>
-            <a href="/#care" className="hover:text-white transition-colors">Care</a>
-            <a href="/#prototype" className="hover:text-white transition-colors">Disclosure</a>
+            <Link href="/#faq" className="hover:text-white transition-colors">FAQ</Link>
+            <Link href="/#care" className="hover:text-white transition-colors">Care</Link>
+            <Link href="/#prototype" className="hover:text-white transition-colors">Disclosure</Link>
           </div>
         </div>
       </footer>

@@ -1,12 +1,12 @@
 "use client";
 
-type ProductImageVariant = "hero" | "detail" | "in-use";
+type ProductImageVariant = "hero" | "detail" | "in-use" | "side" | "top";
 
 interface ProductImageProps {
   variant?: ProductImageVariant;
   className?: string;
-  width?: number;
-  height?: number;
+  width?: number | string;
+  height?: number | string;
 }
 
 export function ProductImage({
@@ -28,6 +28,14 @@ export function ProductImage({
       title: "SniffShift — Dog Interaction Concept",
       desc: "Concept illustration showing a dog's nose and paws engaging with the SniffShift enrichment station during the sniff, shift, and wait stages of the delayed-access mechanism.",
     },
+    side: {
+      title: "SniffShift — Side Profile View",
+      desc: "Concept illustration showing the SniffShift enrichment station from the side profile, highlighting the compact cylindrical form and treat compartment access.",
+    },
+    top: {
+      title: "SniffShift — Top-Down View",
+      desc: "Concept illustration showing the top-down view of SniffShift, displaying the scent chamber, slider controls, and release gate from above.",
+    },
   };
   const config = configs[variant];
 
@@ -36,6 +44,7 @@ export function ProductImage({
       className={className}
       width={width}
       height={height}
+      style={{ maxWidth: "100%", height: "auto" }}
       viewBox="0 0 24 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -67,10 +76,17 @@ export function ProductImage({
           <stop offset="100%" style={{ stopColor: "#E7E3D4", stopOpacity: 0.4 }} />
         </linearGradient>
         <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
-          <feDropShadow dx="0" dy="3" stdDeviation="4" flood-opacity="0.15" />
+          <feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.15" />
         </filter>
         <filter id="innerShadow" x="-20%" y="-20%" width="140%" height="140%">
-          <feDropShadow dx="0" dy="1" stdDeviation="1" flood-opacity="0.25" />
+          <feDropShadow dx="0" dy="1" stdDeviation="1" flood-opacity="0.3" />
+        </filter>
+        <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+          <feMerge>
+            <feMergeNode in="coloredBlur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
         </filter>
       </defs>
 
@@ -236,6 +252,84 @@ export function ProductImage({
           {/* Motion lines */}
           <path d="M15 9 L17 9" fill="none" stroke="#9FB08A" strokeWidth="1" strokeDasharray="2,2" />
           <path d="M9 9 L7 9" fill="none" stroke="#9FB08A" strokeWidth="1" strokeDasharray="2,2" />
+        </>
+      )}
+
+      {/* Side view: profile */}
+      {variant === "side" && (
+        <>
+          {/* Cast shadow */}
+          <ellipse cx="12" cy="16" rx="6" ry="1.5" fill="#000" opacity="0.08" />
+
+          {/* Base */}
+          <rect x="3" y="12" width="18" height="5" rx="2.5" fill="#F1EFE4" stroke="#C9C2B3" strokeWidth="1" />
+
+          {/* Main body side profile */}
+          <rect
+            x="5"
+            y="8"
+            width="14"
+            height="6"
+            rx="2"
+            fill="#E7E3D4"
+            stroke="#6B8A67"
+            strokeWidth="1.5"
+            filter="url(#dropShadow)"
+          />
+
+          {/* Top lip */}
+          <path d="M5 8 Q12 6 19 8" fill="none" stroke="#9FB08A" strokeWidth="1.5" />
+
+          {/* Scent chamber side */}
+          <circle cx="11" cy="10" r="2" fill="url(#coralGrad)" opacity="0.95" />
+
+          {/* Release gate side */}
+          <rect
+            x="10"
+            y="14"
+            width="4"
+            height="2"
+            rx="1"
+            fill="#9FB08A"
+            stroke="#6B8A67"
+            strokeWidth="1"
+          />
+
+          {/* Slider side indicator */}
+          <rect x="6" y="11" width="3" height="1" rx="0.5" fill="#D8D2C4" />
+        </>
+      )}
+
+      {/* Top view: top-down */}
+      {variant === "top" && (
+        <>
+          {/* Cast shadow */}
+          <ellipse cx="12" cy="12" rx="8" ry="3" fill="#000" opacity="0.08" />
+
+          {/* Top base */}
+          <rect x="4" y="4" width="16" height="16" rx="4" fill="#F1EFE4" stroke="#C9C2B3" strokeWidth="1" />
+
+          {/* Top body */}
+          <rect x="6" y="6" width="12" height="12" rx="3" fill="#E7E3D4" stroke="#6B8A67" strokeWidth="1.5" filter="url(#dropShadow)" />
+
+          {/* Scent chamber top */}
+          <circle cx="12" cy="10" r="2.5" fill="url(#coralGrad)" opacity="0.95" />
+
+          {/* Slider tracks top */}
+          <rect x="4" y="8" width="4" height="1.5" rx="0.75" fill="#D8D2C4" />
+          <rect x="16" y="8" width="4" height="1.5" rx="0.75" fill="#D8D2C4" />
+
+          {/* Release gate top */}
+          <rect
+            x="10"
+            y="14"
+            width="4"
+            height="2.5"
+            rx="1.25"
+            fill="#9FB08A"
+            stroke="#6B8A67"
+            strokeWidth="1"
+          />
         </>
       )}
     </svg>

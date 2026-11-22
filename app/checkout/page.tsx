@@ -49,6 +49,97 @@ export default function CheckoutPage() {
     // only in handleSubmit after a successful order creation.
   }, []);
 
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+
+      // Prevent simultaneous duplicate submissions
+      if (isSubmittingRef.current) return;
+      isSubmittingRef.current = true;
+      setIsSubmitting(true);
+      setErrors({});
+
+      const formData = new FormData(e.currentTarget as HTMLFormElement);
+      const customer = {
+        name: formData.get("name") as string,
+        email: formData.get("email") as string,
+        phone: formData.get("phone") as string,
+      };
+      const shippingAddress = {
+        line1: formData.get("line1") as string,
+        line2: (formData.get("line2") as string) || undefined,
+        city: formData.get("city") as string,
+        state: formData.get("state") as string,
+        postalCode: formData.get("postalCode") as string,
+        country: formData.get("country") as string,
+      };
+
+      const payload = {
+        customer,
+        shippingAddress,
+        items: items.map((i) => ({
+          productId: i.productId,
+          variantId: i.variantId,
+          quantity: i.quantity,
+          unitPriceCents: i.unitPriceCents,
+        })),
+        subtotalCents,
+        taxCents,
+        shippingCents: SHIPPING_CENTS,
+        totalCents,
+      };
+
+      try {
+        const res = await fetch("/api/order", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "idempotency-key": idempotencyKeyRef.current!,
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => ({}));
+          // If we got a duplicate response, treat it as success and redirect
+          // to the existing order confirmation.
+          if (errorData.duplicate && errorData.id) {
+            clear();
+            if (typeof window !== "undefined") {
+              sessionStorage.removeItem(IDEMPOTENCY_KEY_STORAGE_KEY);
+            }
+            router.push(`/order/${errorData.id}`);
+            return;
+          }
+          setErrors({
+            general: errorData.message || "Failed to place order. Please try again.",
+          });
+          isSubmittingRef.current = false;
+          setIsSubmitting(false);
+          return;
+        }
+
+        const data = await res.json();
+        clear();
+        if (typeof window !== "undefined") {
+          sessionStorage.removeItem(IDEMPOTENCY_KEY_STORAGE_KEY);
+        }
+        isSubmittingRef.current = false;
+        setIsSubmitting(false);
+
+        // Redirect to order confirmation — survives refresh
+        router.push(`/order/${data.id}`);
+      } catch {
+        setErrors({
+          general: "A network error occurred. Please check your connection and try again.",
+        });
+        isSubmittingRef.current = false;
+        setIsSubmitting(false);
+      }
+    },
+    [items, subtotalCents, taxCents, totalCents, router, clear]
+  );
+
   if (!hydrated) {
     // Cart is still hydrating from localStorage — show a skeleton to
     // prevent incorrect empty-cart flash before data loads.
@@ -122,102 +213,15 @@ export default function CheckoutPage() {
     );
   }
 
-  const handleSubmit = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault();
-
-      // Prevent simultaneous duplicate submissions
-      if (isSubmittingRef.current) return;
-      isSubmittingRef.current = true;
-      setIsSubmitting(true);
-      setErrors({});
-
-      const formData = new FormData(e.currentTarget as HTMLFormElement);
-      const customer = {
-        name: formData.get("name") as string,
-        email: formData.get("email") as string,
-        phone: formData.get("phone") as string,
-      };
-      const shippingAddress = {
-        line1: formData.get("line1") as string,
-        line2: formData.get("line2") as string || undefined,
-        city: formData.get("city") as string,
-        state: formData.get("state") as string,
-        postalCode: formData.get("postalCode") as string,
-        country: formData.get("country") as string,
-      };
-
-      const payload = {
-        customer,
-        shippingAddress,
-        items: items.map((i) => ({
-          productId: i.productId,
-          variantId: i.variantId,
-          quantity: i.quantity,
-          unitPriceCents: i.unitPriceCents,
-        })),
-        subtotalCents,
-        taxCents,
-        shippingCents: SHIPPING_CENTS,
-        totalCents,
-      };
-
-      try {
-        const res = await fetch("/api/order", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "idempotency-key": idempotencyKeyRef.current!,
-          },
-          body: JSON.stringify(payload),
-        });
-
-        if (!res.ok) {
-          const errorData = await res.json().catch(() => ({}));
-          // If we got a duplicate response, treat it as success and redirect
-          // to the existing order confirmation.
-          if (errorData.duplicate && errorData.id) {
-            clear();
-            if (typeof window !== "undefined") {
-              sessionStorage.removeItem(IDEMPOTENCY_KEY_STORAGE_KEY);
-            }
-            router.push(`/order/${errorData.id}`);
-            return;
-          }
-          setErrors({
-            general: errorData.message || "Failed to place order. Please try again.",
-          });
-          isSubmittingRef.current = false;
-          setIsSubmitting(false);
-          return;
-        }
-
-        const data = await res.json();
-        clear();
-        if (typeof window !== "undefined") {
-          sessionStorage.removeItem(IDEMPOTENCY_KEY_STORAGE_KEY);
-        }
-        isSubmittingRef.current = false;
-        setIsSubmitting(false);
-
-        // Redirect to order confirmation — survives refresh
-        router.push(`/order/${data.id}`);
-      } catch {
-        setErrors({
-          general: "A network error occurred. Please check your connection and try again.",
-        });
-        isSubmittingRef.current = false;
-        setIsSubmitting(false);
-      }
-    },
-    [items, subtotalCents, taxCents, totalCents, router]
-  );
-
   return (
     <div className="flex flex-col flex-1">
       <main className="flex-1 py-8 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl">
-          <h1 className="text-2xl font-bold text-foreground mb-8">Checkout</h1>
+          <h1 className="text-2xl font-bold text-foreground mb-2">Checkout</h1>
+          <p className="text-sm text-sage-dark mb-6">
+            Demo checkout &mdash; no payment is collected. Your order details are
+            validated and recorded so you can preview the full confirmation flow.
+          </p>
 
           <div className="grid lg:grid-cols-12 gap-8">
             <div className="lg:col-span-7">

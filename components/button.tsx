@@ -18,7 +18,7 @@ export function Button({
   ...props
 }: ButtonProps) {
   const base =
-    "inline-flex items-center justify-center gap-2 rounded-full font-medium transition-all duration-200 disabled:opacity-50 disabled:pointer-events-none";
+    "inline-flex items-center justify-center gap-2 rounded-full font-medium transition-all duration-300 disabled:opacity-50 disabled:pointer-events-none";
   const variants = {
     primary: "bg-coral text-white hover:bg-coral-dark hover:shadow-lg hover:shadow-coral/25",
     outline:
@@ -28,7 +28,7 @@ export function Button({
   const sizes = {
     sm: "px-4 py-2 text-sm",
     md: "px-6 py-3 text-base",
-    lg: "px-10 py-4 text-lg",
+    lg: "px-8 py-4 text-lg",
   };
   return (
     <button
