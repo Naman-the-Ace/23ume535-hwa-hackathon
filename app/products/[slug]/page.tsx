@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useCallback, FormEvent } from "react";
+import { useParams } from "next/navigation";
 import { product } from "@/app/lib/product";
 import { useCart } from "@/components/cart-provider";
 import { Button } from "@/components/button";
@@ -9,6 +10,8 @@ import { ProductImage } from "@/components/product-image";
 
 export default function ProductPage() {
   const { addItem } = useCart();
+  const params = useParams();
+  const slug = typeof params?.slug === "string" ? params.slug : "";
   const [selectedVariant, setSelectedVariant] = useState<string>(
     product.variants[0].id
   );
@@ -58,6 +61,30 @@ export default function ProductPage() {
     { variant: "detail" as const, label: "Close-up of slider mechanism" },
     { variant: "in-use" as const, label: "Dog interacting with SniffShift" },
   ];
+
+  if (slug && slug !== product.slug) {
+    return (
+      <div className="flex flex-col flex-1">
+        <main className="flex-1 py-20 px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <h1 className="text-3xl font-bold text-foreground mb-4">
+              Product Not Found
+            </h1>
+            <p className="text-sage-dark mb-8">
+              We could not find that product. SniffShift is currently available
+              as a single concept design.
+            </p>
+            <Link
+              href="/products/sniffshift-original"
+              className="inline-flex items-center gap-2 text-coral font-medium hover:text-coral-dark"
+            >
+              View SniffShift
+            </Link>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col flex-1">
