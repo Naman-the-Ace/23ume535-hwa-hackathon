@@ -5,6 +5,14 @@ import { Button } from "@/components/button";
 import Link from "next/link";
 import { ProductImage } from "@/components/product-image";
 
+function decrementButtonClass(qty: number): string {
+  const base =
+    "w-8 h-8 rounded-full border flex items-center justify-center transition-colors disabled:opacity-50 disabled:pointer-events-none";
+  if (qty <= 1)
+    return `${base} border-sage-dark/20 text-sage-dark/30 bg-background`;
+  return `${base} border-sage-dark/30 text-sage-dark hover:bg-cream-dark`;
+}
+
 export function CartDrawer() {
   const {
     items,
@@ -14,7 +22,6 @@ export function CartDrawer() {
     updateQuantity,
     clear,
     subtotalCents,
-    itemCount,
   } = useCart();
 
   const SHIPPING_CENTS = 0;
@@ -95,11 +102,7 @@ export function CartDrawer() {
                         )
                       }
                       disabled={item.quantity <= 1}
-                      className="w-8 h-8 rounded-full border flex items-center justify-center transition-colors disabled:opacity-50 disabled:pointer-events-none ${
-                        item.quantity <= 1
-                          ? "border-sage-dark/20 text-sage-dark/30 bg-background"
-                          : "border-sage-dark/30 text-sage-dark hover:bg-cream-dark"
-                      }"
+                      className={decrementButtonClass(item.quantity)}
                     >
                       −
                     </button>

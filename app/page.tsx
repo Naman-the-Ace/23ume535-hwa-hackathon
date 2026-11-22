@@ -35,7 +35,7 @@ export default function Home() {
       <main className="flex-1">
         <section className="py-24 px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-5xl">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div className="animate-fade-in-up">
                 <span className="text-coral font-bold text-sm tracking-wider uppercase">
                   Dog Enrichment
@@ -104,7 +104,7 @@ export default function Home() {
 
         <section className="py-24 px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-4xl">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div className="relative animate-fade-in-up" style={{ animationDelay: "100ms" }}>
                 <div className="relative bg-sage/10 p-8 rounded-2xl border border-sage/20 text-center shadow-lg shadow-sage/10">
                   <ProductImage variant="detail" width="320" height="320" className="mx-auto" />
@@ -116,7 +116,7 @@ export default function Home() {
                 </h2>
                 <p className="text-sage-dark text-lg leading-relaxed mb-6">
                   SniffShift uses proposed delayed access to extend feeding time
-                  and engage your dog's natural foraging instincts. No instant
+                  and engage your dog&apos;s natural foraging instincts. No instant
                   treats—your dog earns them through scent, shifting, and patience.
                   This is a conceptual design; actual performance has not been
                   verified.
@@ -203,9 +203,9 @@ export default function Home() {
             Delayed-access dog enrichment. Prototype stage.
           </p>
           <div className="flex gap-4 text-sm text-sage/40">
-            <a href="/#how-it-works" className="hover:text-white transition-colors">How It Works</a>
-            <a href="/#faq" className="hover:text-white transition-colors">FAQ</a>
-            <a href="/products/sniffshift-original#prototype" className="hover:text-white transition-colors">Disclosure</a>
+            <Link href="/#how-it-works" className="hover:text-white transition-colors">How It Works</Link>
+            <Link href="/#faq" className="hover:text-white transition-colors">FAQ</Link>
+            <Link href="/products/sniffshift-original#prototype" className="hover:text-white transition-colors">Disclosure</Link>
           </div>
         </div>
       </footer>

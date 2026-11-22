@@ -85,8 +85,8 @@ export async function getOrder(orderId: string): Promise<Order | null> {
   try {
     const result = await get(orderPath(orderId), { access: "private" });
     if (!result) return null;
-    const response = new Response(result.stream as any, {
-      headers: result.headers as any,
+    const response = new Response(result.stream as unknown as BodyInit, {
+      headers: result.headers as unknown as HeadersInit,
     });
     const json = (await response.json()) as Order;
     return json;
@@ -123,8 +123,8 @@ export async function listOrders(): Promise<Order[]> {
   for (const blob of blobs) {
     const res = await get(blob.url, { access: "private" });
     if (!res) continue;
-    const response = new Response(res.stream as any, {
-      headers: res.headers as any,
+    const response = new Response(res.stream as unknown as BodyInit, {
+      headers: res.headers as unknown as HeadersInit,
     });
     const json = (await response.json()) as Order;
     orders.push(json);

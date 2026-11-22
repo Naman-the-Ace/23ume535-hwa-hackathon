@@ -5,8 +5,8 @@ type ProductImageVariant = "hero" | "detail" | "in-use" | "side" | "top";
 interface ProductImageProps {
   variant?: ProductImageVariant;
   className?: string;
-  width?: number;
-  height?: number;
+  width?: number | string;
+  height?: number | string;
 }
 
 export function ProductImage({
@@ -44,6 +44,7 @@ export function ProductImage({
       className={className}
       width={width}
       height={height}
+      style={{ maxWidth: "100%", height: "auto" }}
       viewBox="0 0 24 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"

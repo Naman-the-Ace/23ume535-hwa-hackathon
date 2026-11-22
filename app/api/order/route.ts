@@ -99,15 +99,16 @@ export async function POST(req: Request) {
       totalCents: order.totalCents,
       status: order.status,
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     // Distinguish client errors (400) from server errors (500).
+    const message = err instanceof Error ? err.message : "";
     if (
-      err.message?.includes("Validation error") ||
-      err.message?.includes("Invalid") ||
-      err.message?.includes("Insufficient")
+      message.includes("Validation error") ||
+      message.includes("Invalid") ||
+      message.includes("Insufficient")
     ) {
       return NextResponse.json(
-        { message: err.message || "Failed to create order" },
+        { message: message || "Failed to create order" },
         { status: 400 }
       );
     }
