@@ -27,9 +27,6 @@ export default function CheckoutPage() {
   const taxCents = Math.round(subtotalCents * TAX_RATE);
   const totalCents = subtotalCents + taxCents + SHIPPING_CENTS;
 
-  // Initialize idempotency key once on client mount.
-  // This key survives page refreshes during the same checkout session,
-  // preventing duplicate orders if the customer refreshes after submitting.
   useEffect(() => {
     const stored = sessionStorage.getItem(IDEMPOTENCY_KEY_STORAGE_KEY);
     if (!stored) {
@@ -41,19 +38,14 @@ export default function CheckoutPage() {
     }
   }, []);
 
-  // Only clear the idempotency key after a successful order submission.
-  // Do NOT clear it when the cart is empty during initial mount —
-  // that would delete the key before the customer has a chance to submit.
   useEffect(() => {
-    // This effect intentionally does nothing on mount; key cleanup happens
-    // only in handleSubmit after a successful order creation.
+    // Key cleanup happens only in handleSubmit after successful order
   }, []);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
 
-      // Prevent simultaneous duplicate submissions
       if (isSubmittingRef.current) return;
       isSubmittingRef.current = true;
       setIsSubmitting(true);
@@ -101,8 +93,6 @@ export default function CheckoutPage() {
 
         if (!res.ok) {
           const errorData = await res.json().catch(() => ({}));
-          // If we got a duplicate response, treat it as success and redirect
-          // to the existing order confirmation.
           if (errorData.duplicate && errorData.id) {
             clear();
             if (typeof window !== "undefined") {
@@ -127,7 +117,6 @@ export default function CheckoutPage() {
         isSubmittingRef.current = false;
         setIsSubmitting(false);
 
-        // Redirect to order confirmation — survives refresh
         router.push(`/order/${data.id}`);
       } catch {
         setErrors({
@@ -141,8 +130,6 @@ export default function CheckoutPage() {
   );
 
   if (!hydrated) {
-    // Cart is still hydrating from localStorage — show a skeleton to
-    // prevent incorrect empty-cart flash before data loads.
     return (
       <div className="flex flex-col flex-1">
         <header className="border-b border-cream-dark bg-background/95 sticky top-0 z-20 backdrop-blur-sm">
@@ -214,9 +201,9 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="flex flex-col flex-1">
+    <div className="flex flex-col flex-1 min-w-0">
       <main className="flex-1 py-8 px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-5xl">
+        <div className="mx-auto max-w-5xl max-w-full">
           <h1 className="text-2xl font-bold text-foreground mb-2">Checkout</h1>
           <p className="text-sm text-sage-dark mb-6">
             Demo checkout &mdash; no payment is collected. Your order details are
@@ -224,9 +211,9 @@ export default function CheckoutPage() {
           </p>
 
           <div className="grid lg:grid-cols-12 gap-8">
-            <div className="lg:col-span-7">
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="p-6 bg-cream-dark rounded-2xl border border-cream-dark">
+            <div className="lg:col-span-7 min-w-0">
+              <form onSubmit={handleSubmit} className="space-y-6 max-w-full">
+                <div className="p-6 bg-cream-dark rounded-2xl border border-cream-dark max-w-full">
                   <h2 className="font-bold text-foreground mb-4">Customer Details</h2>
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
@@ -237,7 +224,7 @@ export default function CheckoutPage() {
                         name="name"
                         type="text"
                         required
-                        className="w-full px-4 py-2 rounded-lg border border-sage-dark/30 bg-background text-sage-dark focus:outline-none focus:ring-2 focus:ring-coral"
+                        className="w-full max-w-full px-4 py-2 rounded-lg border border-sage-dark/30 bg-background text-sage-dark focus:outline-none focus:ring-2 focus:ring-coral"
                       />
                       {errors.customer?.name && (
                         <p className="text-xs text-red-600">{errors.customer.name}</p>
@@ -251,7 +238,7 @@ export default function CheckoutPage() {
                         name="email"
                         type="email"
                         required
-                        className="w-full px-4 py-2 rounded-lg border border-sage-dark/30 bg-background text-sage-dark focus:outline-none focus:ring-2 focus:ring-coral"
+                        className="w-full max-w-full px-4 py-2 rounded-lg border border-sage-dark/30 bg-background text-sage-dark focus:outline-none focus:ring-2 focus:ring-coral"
                       />
                       {errors.customer?.email && (
                         <p className="text-xs text-red-600">{errors.customer.email}</p>
@@ -266,7 +253,7 @@ export default function CheckoutPage() {
                       name="phone"
                       type="tel"
                       required
-                      className="w-full px-4 py-2 rounded-lg border border-sage-dark/30 bg-background text-sage-dark focus:outline-none focus:ring-2 focus:ring-coral"
+                      className="w-full max-w-full px-4 py-2 rounded-lg border border-sage-dark/30 bg-background text-sage-dark focus:outline-none focus:ring-2 focus:ring-coral"
                     />
                     {errors.customer?.phone && (
                       <p className="text-xs text-red-600">{errors.customer.phone}</p>
@@ -274,7 +261,7 @@ export default function CheckoutPage() {
                   </div>
                 </div>
 
-                <div className="p-6 bg-cream-dark rounded-2xl border border-cream-dark mt-6">
+                <div className="p-6 bg-cream-dark rounded-2xl border border-cream-dark max-w-full">
                   <h2 className="font-bold text-foreground mb-4">Shipping Address</h2>
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
@@ -285,7 +272,7 @@ export default function CheckoutPage() {
                         name="line1"
                         type="text"
                         required
-                        className="w-full px-4 py-2 rounded-lg border border-sage-dark/30 bg-background text-sage-dark focus:outline-none focus:ring-2 focus:ring-coral"
+                        className="w-full max-w-full px-4 py-2 rounded-lg border border-sage-dark/30 bg-background text-sage-dark focus:outline-none focus:ring-2 focus:ring-coral"
                       />
                       {errors.shippingAddress?.line1 && (
                         <p className="text-xs text-red-600">{errors.shippingAddress.line1}</p>
@@ -298,7 +285,7 @@ export default function CheckoutPage() {
                       <input
                         name="line2"
                         type="text"
-                        className="w-full px-4 py-2 rounded-lg border border-sage-dark/30 bg-background text-sage-dark focus:outline-none focus:ring-2 focus:ring-coral"
+                        className="w-full max-w-full px-4 py-2 rounded-lg border border-sage-dark/30 bg-background text-sage-dark focus:outline-none focus:ring-2 focus:ring-coral"
                       />
                     </div>
                   </div>
@@ -311,7 +298,7 @@ export default function CheckoutPage() {
                         name="city"
                         type="text"
                         required
-                        className="w-full px-4 py-2 rounded-lg border border-sage-dark/30 bg-background text-sage-dark focus:outline-none focus:ring-2 focus:ring-coral"
+                        className="w-full max-w-full px-4 py-2 rounded-lg border border-sage-dark/30 bg-background text-sage-dark focus:outline-none focus:ring-2 focus:ring-coral"
                       />
                       {errors.shippingAddress?.city && (
                         <p className="text-xs text-red-600">{errors.shippingAddress.city}</p>
@@ -325,7 +312,7 @@ export default function CheckoutPage() {
                         name="state"
                         type="text"
                         required
-                        className="w-full px-4 py-2 rounded-lg border border-sage-dark/30 bg-background text-sage-dark focus:outline-none focus:ring-2 focus:ring-coral"
+                        className="w-full max-w-full px-4 py-2 rounded-lg border border-sage-dark/30 bg-background text-sage-dark focus:outline-none focus:ring-2 focus:ring-coral"
                       />
                       {errors.shippingAddress?.state && (
                         <p className="text-xs text-red-600">{errors.shippingAddress.state}</p>
@@ -339,7 +326,7 @@ export default function CheckoutPage() {
                         name="postalCode"
                         type="text"
                         required
-                        className="w-full px-4 py-2 rounded-lg border border-sage-dark/30 bg-background text-sage-dark focus:outline-none focus:ring-2 focus:ring-coral"
+                        className="w-full max-w-full px-4 py-2 rounded-lg border border-sage-dark/30 bg-background text-sage-dark focus:outline-none focus:ring-2 focus:ring-coral"
                       />
                       {errors.shippingAddress?.postalCode && (
                         <p className="text-xs text-red-600">{errors.shippingAddress.postalCode}</p>
@@ -354,7 +341,7 @@ export default function CheckoutPage() {
                         type="text"
                         defaultValue="US"
                         required
-                        className="w-full px-4 py-2 rounded-lg border border-sage-dark/30 bg-background text-sage-dark focus:outline-none focus:ring-2 focus:ring-coral"
+                        className="w-full max-w-full px-4 py-2 rounded-lg border border-sage-dark/30 bg-background text-sage-dark focus:outline-none focus:ring-2 focus:ring-coral"
                       />
                       {errors.shippingAddress?.country && (
                         <p className="text-xs text-red-600">{errors.shippingAddress.country}</p>
@@ -364,7 +351,7 @@ export default function CheckoutPage() {
                 </div>
 
                 {errors.general && (
-                  <div className="p-4 rounded-lg bg-red-50 border border-red-100 text-red-700 text-sm">
+                  <div className="p-4 rounded-lg bg-red-50 border border-red-100 text-red-700 text-sm max-w-full">
                     {errors.general}
                   </div>
                 )}
@@ -372,7 +359,7 @@ export default function CheckoutPage() {
                 <Button
                   type="submit"
                   variant="primary"
-                  className="w-full shadow-lg shadow-coral/20"
+                  className="w-full max-w-full shadow-lg shadow-coral/20"
                   isLoading={isSubmitting}
                   disabled={isSubmitting}
                 >
@@ -382,24 +369,24 @@ export default function CheckoutPage() {
             </div>
 
             <div className="lg:col-span-5">
-              <div className="p-6 bg-cream-dark rounded-2xl border border-cream-dark">
+              <div className="p-6 bg-cream-dark rounded-2xl border border-cream-dark sticky top-24 self-start max-w-full">
                 <h2 className="font-bold text-foreground mb-4">Order Summary</h2>
                 <div className="space-y-3 mb-6">
                   <div className="flex justify-between text-sm">
-                    <span className="text-sage-dark">Subtotal ({itemCount} item{itemCount !== 1 ? "s" : ""})</span>
-                    <span className="font-medium text-foreground">${(subtotalCents / 100).toFixed(2)}</span>
+                    <span className="text-sage-dark truncate">Subtotal ({itemCount} item{itemCount !== 1 ? "s" : ""})</span>
+                    <span className="font-medium text-foreground shrink-0">${(subtotalCents / 100).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-sage-dark">Tax (8%)</span>
-                    <span className="font-medium text-foreground">${(taxCents / 100).toFixed(2)}</span>
+                    <span className="font-medium text-foreground shrink-0">${(taxCents / 100).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-sage-dark">Shipping</span>
-                    <span className="font-medium text-sage-dark">Free</span>
+                    <span className="font-medium text-sage-dark shrink-0">Free</span>
                   </div>
                   <div className="flex justify-between text-lg font-bold pt-2 border-t border-sage-dark/20">
                     <span className="text-foreground">Total</span>
-                    <span className="text-coral">${(totalCents / 100).toFixed(2)}</span>
+                    <span className="text-coral shrink-0">${(totalCents / 100).toFixed(2)}</span>
                   </div>
                 </div>
               </div>

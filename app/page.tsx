@@ -33,17 +33,17 @@ export default function Home() {
   return (
     <div className="flex flex-col flex-1">
       <main className="flex-1">
-        <section className="py-24 px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-5xl">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              <div className="animate-fade-in-up">
-                <span className="text-coral font-bold text-sm tracking-wider uppercase">
-                  Dog Enrichment
+        <section className="relative py-28 px-4 sm:px-6 lg:px-8 overflow-hidden">
+          <div className="mx-auto max-w-7xl">
+            <div className="grid lg:grid-cols-12 gap-10 lg:gap-16 items-center">
+              <div className="lg:col-span-7 animate-fade-in-up">
+                <span className="inline-block text-coral font-bold text-sm tracking-wider uppercase mb-4">
+                  Dog Enrichment Concept
                 </span>
-                <h1 className="text-5xl sm:text-6xl font-bold tracking-tight text-foreground mb-6 leading-tight">
-                  Delayed access. Real enrichment.
+                <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-foreground leading-[1.05] mb-6">
+                  Delayed access.<br />Real enrichment.
                 </h1>
-                <p className="text-lg sm:text-xl text-sage-dark mb-8 max-w-lg leading-relaxed">
+                <p className="text-lg sm:text-xl lg:text-2xl text-sage-dark mb-10 max-w-2xl leading-relaxed">
                   SniffShift is a conceptual puzzle feeder that makes dogs work
                   through scent, shifting, and waiting. Presented as a prototype
                   design — not a finished product.
@@ -51,35 +51,40 @@ export default function Home() {
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Link
                     href="/products/sniffshift-original"
-                    className="flex-1 sm:w-auto px-8 py-4 rounded-full bg-coral text-white text-lg font-semibold hover:bg-coral-dark transition-all duration-300 shadow-lg shadow-coral/25"
+                    className="w-full sm:w-auto px-10 py-5 rounded-full bg-coral text-white text-lg font-semibold hover:bg-coral-dark transition-all duration-300 shadow-lg shadow-coral/25 btn-lift text-center"
                   >
                     Order SniffShift — $34
                   </Link>
                   <Link
                     href="#how-it-works"
-                    className="flex-1 sm:w-auto px-8 py-4 rounded-full border border-sage-dark text-sage-dark text-lg font-semibold hover:bg-cream-dark transition-all duration-300"
+                    className="w-full sm:w-auto px-10 py-5 rounded-full border-2 border-sage-dark text-sage-dark text-lg font-semibold hover:bg-cream-dark transition-all duration-300 text-center"
                   >
                     How it works
                   </Link>
                 </div>
+                <p className="mt-6 text-sm text-sage-dark/60 italic">
+                  Prototype concept — specifications and performance not verified
+                </p>
               </div>
-              <div className="relative animate-fade-in-up" style={{ animationDelay: "200ms" }}>
-                <div className="relative bg-sage/10 p-8 rounded-2xl border border-sage/20 text-center shadow-xl shadow-sage/10">
-                  <ProductImage variant="hero" width="320" height="320" className="mx-auto" />
-                  <div className="absolute -inset-1 bg-gradient-to-r from-coral/30 to-sage/30 rounded-2xl blur opacity-50"></div>
+              <div className="lg:col-span-5 relative animate-fade-in-up" style={{ animationDelay: "200ms" }}>
+                <div className="relative aspect-square w-full max-w-lg mx-auto lg:mx-0">
+                  <div className="absolute inset-0 bg-gradient-to-br from-coral/20 via-transparent to-sage/20 rounded-3xl blur-2xl opacity-50" />
+                  <div className="relative bg-cream/50 backdrop-blur-sm rounded-3xl border border-sage/20 p-2 shadow-2xl shadow-sage/10">
+                    <ProductImage variant="hero" width={520} height={520} className="mx-auto" showDisclosure={false} />
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        <section id="how-it-works" className="py-24 bg-cream-dark">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <section id="how-it-works" className="py-28 bg-cream-dark">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
-              <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight">
                 How it works
               </h2>
-              <p className="mt-4 text-sage-dark">
+              <p className="mt-4 text-sage-dark max-w-2xl mx-auto">
                 Three proposed stages, delayed access, conceptual engagement.
               </p>
             </div>
@@ -102,35 +107,52 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="py-24 px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-4xl">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <section className="py-28 px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl">
+            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-center mb-16">
+              Proposed mechanism sequence
+            </h2>
+            <div className="relative max-w-full">
+              <ProductImage
+                variant="mechanism"
+                width={1200}
+                height={627}
+                className="mx-auto rounded-2xl shadow-xl shadow-sage/10 max-w-full"
+                showDisclosure={true}
+              />
+            </div>
+          </div>
+        </section>
+
+        <section className="py-28 bg-cream-dark">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="grid lg:grid-cols-2 gap-16 items-center">
               <div className="relative animate-fade-in-up" style={{ animationDelay: "100ms" }}>
-                <div className="relative bg-sage/10 p-8 rounded-2xl border border-sage/20 text-center shadow-lg shadow-sage/10">
-                  <ProductImage variant="detail" width="320" height="320" className="mx-auto" />
+                <div className="relative bg-sage/5 rounded-2xl border border-sage/20 p-4 shadow-xl shadow-sage/10 max-w-full">
+                  <ProductImage variant="detail" width={560} height={560} className="mx-auto max-w-full" showDisclosure={false} />
                 </div>
               </div>
               <div className="animate-fade-in-up" style={{ animationDelay: "300ms" }}>
-                <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6">
                   A puzzle feeder concept, not just a toy
                 </h2>
-                <p className="text-sage-dark text-lg leading-relaxed mb-6">
+                <p className="text-sage-dark text-lg leading-relaxed mb-8 max-w-xl">
                   SniffShift uses proposed delayed access to extend feeding time
                   and engage your dog&apos;s natural foraging instincts. No instant
                   treats—your dog earns them through scent, shifting, and patience.
                   This is a conceptual design; actual performance has not been
                   verified.
                 </p>
-                <ul className="space-y-3">
+                <ul className="space-y-4">
                   {[
                     "Proposed delayed-access release gate",
                     "Proposed scent chamber for treat concealment",
                     "Proposed slider mechanism for paw and nose interaction",
                     "Three size options proposed (Small, Medium, Large)",
                   ].map((feature) => (
-                    <li key={feature} className="flex items-start gap-3">
-                      <span className="text-coral font-bold">✓</span>
-                      <span>{feature}</span>
+                    <li key={feature} className="flex items-start gap-4">
+                      <span className="text-coral font-bold text-xl mt-0.5 shrink-0">✓</span>
+                      <span className="text-foreground text-lg">{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -139,29 +161,48 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="py-24 bg-cream-dark">
-          <div className="mx-auto max-w-4xl">
-            <div className="relative bg-sage/5 rounded-2xl border border-sage/20 p-8 sm:p-12 text-center shadow-lg shadow-sage/10 animate-fade-in-up">
-              <ProductImage variant="in-use" width="280" height="280" className="mx-auto mb-6" />
-              <h2 className="text-3xl font-bold text-foreground mb-4">
-                Designed for curious dogs
-              </h2>
-              <p className="text-sage-dark text-lg leading-relaxed mb-6 max-w-md mx-auto">
-                Every interaction with SniffShift is an opportunity for mental
-                stimulation. Your dog sniffs, shifts, and waits — turning
-                mealtime into enrichment.
-              </p>
-              <Link
-                href="/products/sniffshift-original"
-                className="inline-flex items-center justify-center gap-2 px-8 py-3 rounded-full bg-coral text-white text-base font-semibold hover:bg-coral-dark transition-all duration-300 shadow-lg shadow-coral/25"
-              >
-                View Product →
-              </Link>
+        <section className="py-28 px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl">
+            <div className="grid lg:grid-cols-2 gap-16 items-center">
+              <div className="animate-fade-in-up" style={{ animationDelay: "100ms" }}>
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6">
+                  Designed for curious dogs
+                </h2>
+                <p className="text-sage-dark text-lg leading-relaxed mb-8 max-w-xl">
+                  Every interaction with SniffShift is an opportunity for mental
+                  stimulation. Your dog sniffs, shifts, and waits — turning
+                  mealtime into enrichment.
+                </p>
+                <ul className="space-y-4 mb-8">
+                  {[
+                    "Engages natural foraging instincts",
+                    "Proposed to extend feeding duration",
+                    "Three size options for different breeds",
+                    "Supervised introduction recommended",
+                  ].map((item) => (
+                    <li key={item} className="flex items-center gap-3 text-sage-dark">
+                      <span className="text-coral font-bold">→</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  href="/products/sniffshift-original"
+                  className="inline-flex items-center justify-center gap-2 px-10 py-4 rounded-full bg-coral text-white text-base font-semibold hover:bg-coral-dark transition-all duration-300 shadow-lg shadow-coral/25 btn-lift"
+                >
+                  View Product →
+                </Link>
+              </div>
+              <div className="relative animate-fade-in-up" style={{ animationDelay: "300ms" }}>
+                <div className="relative bg-sage/5 rounded-2xl border border-sage/20 p-4 shadow-xl shadow-sage/10 max-w-full">
+                  <ProductImage variant="in-use" width={560} height={560} className="mx-auto max-w-full" showDisclosure={false} />
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
-        <section id="faq" className="py-24 bg-cream-dark">
+        <section id="faq" className="py-28 bg-cream-dark">
           <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-center mb-12">
               FAQ
@@ -177,15 +218,15 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="py-24 px-4 sm:px-6 lg:px-8 text-center">
+        <section className="py-28 px-4 sm:px-6 lg:px-8 text-center">
           <div className="mx-auto max-w-2xl animate-fade-in-up">
-            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4">
               Ready to enrich?
             </h2>
-            <p className="text-sage-dark mb-8">Order your SniffShift today.</p>
+            <p className="text-sage-dark mb-8 text-lg">Order your SniffShift today.</p>
             <Link
               href="/products/sniffshift-original"
-              className="inline-flex items-center justify-center gap-2 px-10 py-4 rounded-full bg-coral text-white text-lg font-semibold hover:bg-coral-dark transition-all duration-300 shadow-lg shadow-coral/25"
+              className="inline-flex items-center justify-center gap-2 px-12 py-5 rounded-full bg-coral text-white text-lg font-semibold hover:bg-coral-dark transition-all duration-300 shadow-lg shadow-coral/25 btn-lift"
             >
               Order SniffShift — $34
             </Link>
@@ -194,7 +235,7 @@ export default function Home() {
       </main>
 
       <footer className="bg-sage-dark text-white py-12 border-t border-sage mt-auto">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2">
             <span className="text-coral font-bold tracking-tight">Sniff</span>
             <span className="font-bold tracking-tight">Shift</span>

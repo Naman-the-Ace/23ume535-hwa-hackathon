@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useState } from "react";
 import { useCart } from "@/components/cart-provider";
 import { CartDrawer } from "@/components/cart-drawer";
-import { ProductImage } from "@/components/product-image";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -12,6 +11,29 @@ const navLinks = [
   { href: "/#faq", label: "FAQ" },
   { href: "/products/sniffshift-original", label: "Product" },
 ];
+
+function Logo() {
+  return (
+    <svg
+      className="h-6 w-6"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <rect x="5" y="14" width="14" height="6" rx="3" fill="#F1EFE4" stroke="#C9C2B3" strokeWidth="1" />
+      <rect x="7" y="8" width="10" height="8" rx="2" fill="#E7E3D4" stroke="#6B8A67" strokeWidth="1.5" />
+      <path d="M7 8 Q12 6 17 8" fill="none" stroke="#9FB08A" strokeWidth="1.5" />
+      <circle cx="12" cy="10" r="2.5" fill="#E76F51" opacity="0.95" />
+      <circle cx="12" cy="10" r="1.5" fill="#C0563D" />
+      <rect x="6.5" y="13" width="4" height="1.5" rx="0.75" fill="#D8D2C4" />
+      <rect x="13.5" y="13" width="4" height="1.5" rx="0.75" fill="#D8D2C4" />
+      <rect x="10" y="16.5" width="4" height="2.5" rx="1.25" fill="#9FB08A" stroke="#6B8A67" strokeWidth="1" />
+      <rect x="6" y="18.5" width="2" height="1.5" rx="0.5" fill="#6B8A67" />
+      <rect x="16" y="18.5" width="2" height="1.5" rx="0.5" fill="#6B8A67" />
+    </svg>
+  );
+}
 
 export function Header() {
   const { itemCount, openCart } = useCart();
@@ -23,7 +45,7 @@ export function Header() {
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <Link href="/" className="flex items-center gap-2">
-              <ProductImage variant="hero" className="h-6 w-6" />
+              <Logo />
               <span className="text-coral font-bold tracking-tight">Sniff</span>
               <span className="text-sage-dark font-bold tracking-tight">Shift</span>
             </Link>
