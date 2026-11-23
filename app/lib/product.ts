@@ -54,16 +54,24 @@ export const product: Product = {
   category: "Dog Enrichment",
   images: [
     {
-      url: "/images/product/hero.jpg",
-      alt: "SniffShift Enrichment Station - cream and sage with coral accent",
+      url: "/images/product/hero.png",
+      alt: "SniffShift Enrichment Station — front-three-quarter concept view showing cream body, sage slider bar and knobs, coral scent chamber, and dark green grip base",
     },
     {
-      url: "/images/product/detail.jpg",
-      alt: "SniffShift close-up showing slider mechanism",
+      url: "/images/product/cutaway.png",
+      alt: "Cutaway concept illustration revealing internal treat chamber, slider rail, release gate, and sage control components",
     },
     {
-      url: "/images/product/in-use.jpg",
-      alt: "Dog using SniffShift enrichment station",
+      url: "/images/product/in-use.png",
+      alt: "Concept illustration of a dog sniffing the coral scent chamber with front paw resting on the floor beside the station",
+    },
+    {
+      url: "/images/product/side.png",
+      alt: "Side profile concept view showing the cylindrical form, top rim, and scent chamber placement",
+    },
+    {
+      url: "/images/product/top.png",
+      alt: "Top-down concept view displaying the scent chamber, dual sage slider knobs, and release gate arrangement",
     },
   ],
   variants: [

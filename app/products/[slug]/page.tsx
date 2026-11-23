@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useCallback, FormEvent } from "react";
+import { useState, useCallback, FormEvent, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { product } from "@/app/lib/product";
 import { useCart } from "@/components/cart-provider";
 import { Button } from "@/components/button";
 import { ProductImage } from "@/components/product-image";
+import { notFound } from "next/navigation";
 
 export default function ProductPage() {
   const { addItem } = useCart();
@@ -21,6 +22,11 @@ export default function ProductPage() {
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
   const [added, setAdded] = useState(false);
+  const [imageKey, setImageKey] = useState(0);
+
+  if (slug && slug !== product.slug) {
+    notFound();
+  }
 
   const variant = product.variants.find((v) => v.id === selectedVariant);
   const priceCents = variant
@@ -48,10 +54,11 @@ export default function ProductPage() {
         unitPriceCents: priceCents,
       });
       setAdded(true);
+      setImageKey((k) => k + 1);
       setTimeout(() => {
         setIsAdding(false);
         setAdded(false);
-      }, 1200);
+      }, 1500);
     },
     [variant, isInStock, isAdding, addItem, quantity, priceCents]
   );
@@ -64,29 +71,12 @@ export default function ProductPage() {
     { variant: "top" as const, label: "Top-down view" },
   ];
 
-  if (slug && slug !== product.slug) {
-    return (
-      <div className="flex flex-col flex-1">
-        <main className="flex-1 py-20 px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-2xl text-center">
-            <h1 className="text-3xl font-bold text-foreground mb-4">
-              Product Not Found
-            </h1>
-            <p className="text-sage-dark mb-8">
-              We could not find that product. SniffShift is currently available
-              as a single concept design.
-            </p>
-            <Link
-              href="/products/sniffshift-original"
-              className="inline-flex items-center gap-2 text-coral font-medium hover:text-coral-dark"
-            >
-              View SniffShift
-            </Link>
-          </div>
-        </main>
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (added) {
+      const timer = setTimeout(() => setAdded(false), 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [added]);
 
   return (
     <div className="flex flex-col flex-1">
@@ -102,6 +92,7 @@ export default function ProductPage() {
             <div className="space-y-6">
               <div className="relative bg-cream-dark rounded-2xl overflow-hidden aspect-square flex items-center justify-center border border-cream-dark max-w-full">
                 <ProductImage
+                  key={imageKey}
                   variant={selectedImageVariant}
                   width={560}
                   height={560}
@@ -115,12 +106,15 @@ export default function ProductPage() {
                   return (
                     <button
                       key={img.variant}
-                      onClick={() => setSelectedImageVariant(img.variant)}
+                      onClick={() => {
+                        setSelectedImageVariant(img.variant);
+                        setImageKey((k) => k + 1);
+                      }}
                       aria-label={img.label}
                       aria-pressed={isActive}
-                      className={`w-24 h-24 sm:w-28 sm:h-28 rounded-xl border transition-all duration-200 flex items-center justify-center shrink-0 ${
+                      className={`w-24 h-24 sm:w-28 sm:h-28 rounded-xl border transition-all duration-300 flex items-center justify-center shrink-0 ${
                         isActive
-                          ? "border-coral bg-coral/10 shadow-sm shadow-coral/10"
+                          ? "border-coral bg-coral/10 shadow-sm shadow-coral/10 scale-105"
                           : "border-sage-dark/20 hover:border-coral hover:bg-cream-dark"
                       }`}
                     >
@@ -161,7 +155,7 @@ export default function ProductPage() {
                   <span className="text-sage-dark text-sm">USD</span>
                 </div>
                 <p className="text-sm text-sage-dark">
-                  Free shipping on all orders
+                  Free shipping on all demo orders
                 </p>
               </div>
 
@@ -175,15 +169,22 @@ export default function ProductPage() {
                       key={v.id}
                       onClick={() => setSelectedVariant(v.id)}
                       aria-pressed={selectedVariant === v.id}
-                      className={`flex-1 py-3 rounded-xl border font-medium text-sm transition-all min-w-[80px] ${
+                      className={`flex-1 py-4 rounded-xl border font-medium text-sm transition-all min-w-[90px] relative ${
                         selectedVariant === v.id
-                          ? "bg-coral text-white border-coral shadow-md shadow-coral/20"
+                          ? "bg-coral text-white border-coral shadow-lg shadow-coral/30 ring-2 ring-coral ring-offset-2 ring-offset-background"
                           : "bg-background text-sage-dark border-sage-dark/30 hover:border-sage-dark hover:bg-cream-dark"
                       }`}
                     >
-                      {v.name}
-                      {v.priceDelta > 0 && (
-                        <span className="text-xs ml-1 opacity-80">+${(v.priceDelta / 100).toFixed(2)}</span>
+                      <span className="flex items-center justify-center gap-1.5">
+                        {v.name}
+                        {v.priceDelta > 0 && (
+                          <span className="text-xs opacity-90 bg-white/20 px-2 py-0.5 rounded-full">+${(v.priceDelta / 100).toFixed(2)}</span>
+                        )}
+                      </span>
+                      {selectedVariant === v.id && (
+                        <span className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-coral text-white flex items-center justify-center text-xs font-bold">
+                          ✓
+                        </span>
                       )}
                     </button>
                   ))}
@@ -199,6 +200,7 @@ export default function ProductPage() {
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                     disabled={quantity <= 1}
                     className={qtyButtonClass(quantity <= 1)}
+                    aria-label="Decrease quantity"
                   >
                     −
                   </button>
@@ -210,15 +212,17 @@ export default function ProductPage() {
                       if (!isNaN(val) && val >= 1 && val <= 10)
                         setQuantity(val);
                     }}
-                    className="w-12 h-10 text-center border border-sage-dark/30 rounded-lg text-sage-dark focus:outline-none focus:ring-2 focus:ring-coral"
+                    className="w-14 h-10 text-center border border-sage-dark/30 rounded-lg text-sage-dark focus:outline-none focus:ring-2 focus:ring-coral"
                     min="1"
                     max="10"
                     readOnly
+                    aria-label="Quantity"
                   />
                   <button
                     onClick={() => setQuantity((q) => Math.min(10, q + 1))}
                     disabled={quantity >= 10}
                     className={qtyButtonClass(quantity >= 10)}
+                    aria-label="Increase quantity"
                   >
                     +
                   </button>
@@ -234,10 +238,12 @@ export default function ProductPage() {
                   isLoading={isAdding}
                   disabled={!isInStock || isAdding}
                 >
-                  {added ? (
-                    <>Added to cart <span className="text-coral">✓</span></>
-                  ) : isAdding ? (
+                  {isAdding ? (
                     "Adding…"
+                  ) : added ? (
+                    <>
+                      Added to cart <span className="text-coral animate-bounce">✓</span>
+                    </>
                   ) : (
                     "Add to Cart"
                   )}
@@ -247,6 +253,9 @@ export default function ProductPage() {
                     This variant is currently out of stock.
                   </p>
                 )}
+                <p className="mt-3 text-xs text-sage-dark/60 text-center">
+                  Demo checkout — no payment will be collected
+                </p>
               </form>
             </div>
           </div>
@@ -351,8 +360,8 @@ export default function ProductPage() {
           </p>
           <div className="flex gap-4 text-sm text-sage/40">
             <Link href="/#faq" className="hover:text-white transition-colors">FAQ</Link>
-            <Link href="/#care" className="hover:text-white transition-colors">Care</Link>
-            <Link href="/#prototype" className="hover:text-white transition-colors">Disclosure</Link>
+            <Link href="/products/sniffshift-original#care" className="hover:text-white transition-colors">Care</Link>
+            <Link href="/products/sniffshift-original#prototype" className="hover:text-white transition-colors">Disclosure</Link>
           </div>
         </div>
       </footer>

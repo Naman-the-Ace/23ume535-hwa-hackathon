@@ -32,7 +32,7 @@ export default function CartPage() {
     <div className="flex flex-col flex-1">
       <main className="flex-1 py-8 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl">
-          <h1 className="text-2xl font-bold text-foreground mb-8">Your Cart</h1>
+          <h1 className="text-2xl font-bold text-foreground mb-8">Your Demo Cart</h1>
 
           {items.length === 0 ? (
             <div className="mx-auto max-w-2xl text-center py-20">
@@ -148,13 +148,17 @@ export default function CartPage() {
                         <span className="text-sage-dark">Shipping</span>
                         <span className="font-medium text-sage-dark shrink-0">Free</span>
                       </div>
+                      <div className="flex justify-between text-sm text-coral">
+                        <span className="text-sage-dark">Tax (8%)</span>
+                        <span className="font-medium text-coral shrink-0">${(taxCents / 100).toFixed(2)}</span>
+                      </div>
                       <div className="flex justify-between text-lg font-bold pt-2 border-t border-sage-dark/20">
                         <span className="text-foreground">Total</span>
                         <span className="text-coral shrink-0">${(totalCents / 100).toFixed(2)}</span>
                       </div>
                     </div>
                     <p className="text-xs text-sage-dark/60 text-center">
-                      Taxes calculated at checkout
+                      Demo order — taxes shown for illustration only
                     </p>
                   </div>
                 </div>

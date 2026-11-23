@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { product } from "@/app/lib/product";
 import { ProductImage } from "@/components/product-image";
+import { MechanismDemo } from "@/components/mechanism-demo";
+import { HeroTilt } from "@/components/hero-tilt";
 
 const faqs = [
   {
@@ -70,7 +72,9 @@ export default function Home() {
                 <div className="relative aspect-square w-full max-w-lg mx-auto lg:mx-0">
                   <div className="absolute inset-0 bg-gradient-to-br from-coral/20 via-transparent to-sage/20 rounded-3xl blur-2xl opacity-50" />
                   <div className="relative bg-cream/50 backdrop-blur-sm rounded-3xl border border-sage/20 p-2 shadow-2xl shadow-sage/10">
-                    <ProductImage variant="hero" width={520} height={520} className="mx-auto" showDisclosure={false} />
+                    <HeroTilt maxTilt={5} perspective={1200} scale={1.015} maxGlare={0.12}>
+                      <ProductImage variant="hero" width={520} height={520} className="mx-auto" showDisclosure={false} />
+                    </HeroTilt>
                   </div>
                 </div>
               </div>
@@ -217,6 +221,8 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        <MechanismDemo />
 
         <section className="py-28 px-4 sm:px-6 lg:px-8 text-center">
           <div className="mx-auto max-w-2xl animate-fade-in-up">

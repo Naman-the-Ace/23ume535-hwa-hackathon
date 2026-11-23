@@ -204,7 +204,7 @@ export default function CheckoutPage() {
     <div className="flex flex-col flex-1 min-w-0">
       <main className="flex-1 py-8 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl max-w-full">
-          <h1 className="text-2xl font-bold text-foreground mb-2">Checkout</h1>
+          <h1 className="text-2xl font-bold text-foreground mb-2">Demo Checkout</h1>
           <p className="text-sm text-sage-dark mb-6">
             Demo checkout &mdash; no payment is collected. Your order details are
             validated and recorded so you can preview the full confirmation flow.
@@ -370,15 +370,15 @@ export default function CheckoutPage() {
 
             <div className="lg:col-span-5">
               <div className="p-6 bg-cream-dark rounded-2xl border border-cream-dark sticky top-24 self-start max-w-full">
-                <h2 className="font-bold text-foreground mb-4">Order Summary</h2>
+                <h2 className="font-bold text-foreground mb-4">Demo Order Summary</h2>
                 <div className="space-y-3 mb-6">
                   <div className="flex justify-between text-sm">
                     <span className="text-sage-dark truncate">Subtotal ({itemCount} item{itemCount !== 1 ? "s" : ""})</span>
                     <span className="font-medium text-foreground shrink-0">${(subtotalCents / 100).toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between text-sm">
+                  <div className="flex justify-between text-sm text-coral">
                     <span className="text-sage-dark">Tax (8%)</span>
-                    <span className="font-medium text-foreground shrink-0">${(taxCents / 100).toFixed(2)}</span>
+                    <span className="font-medium text-coral shrink-0">${(taxCents / 100).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-sage-dark">Shipping</span>
@@ -389,6 +389,9 @@ export default function CheckoutPage() {
                     <span className="text-coral shrink-0">${(totalCents / 100).toFixed(2)}</span>
                   </div>
                 </div>
+                <p className="text-xs text-sage-dark/60 text-center">
+                  Demo order — taxes shown for illustration only
+                </p>
               </div>
             </div>
           </div>
