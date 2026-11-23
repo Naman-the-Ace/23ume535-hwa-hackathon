@@ -43,11 +43,11 @@ SniffShift is a **conceptual enrichment station** with a proposed three-stage se
 - **Product page** with 5-image interactive gallery, variant selection (Small/Medium/Large), quantity controls
 - **Cart** with live quantity updates, tax (8%) display, free shipping
 - **Demo checkout** with 8-field form, idempotency keys, order confirmation page
-- **Order API** with deduplication, atomic writes via Vercel Blob
+- **Order API** with idempotency-key deduplication (check-then-write via Vercel Blob)
 
 ### 🎮 Interactive Mechanism Demo
-- **Sniff stage**: Animated scent waves from coral chamber
-- **Shift stage**: Dual keyboard-accessible sliders (Arrow keys, Home/End)
+- **Sniff stage**: Click/tap the scent chamber to advance; animated scent waves from coral chamber
+- **Shift stage**: Dual keyboard-accessible sliders (Arrow keys, Home/End) — both must reach 100%
 - **Wait stage**: Timed gate animation → treat release
 - **Reset / Replay** controls, full keyboard support, "Concept simulation" badge
 
@@ -57,7 +57,7 @@ SniffShift is a **conceptual enrichment station** with a proposed three-stage se
 - **Touch support** for mobile
 - **Respects `prefers-reduced-motion`** — instantly disables all motion
 
-### ♿ Accessibility First
+### ♿ Accessibility
 - Semantic HTML5, ARIA labels/roles throughout
 - Focus-visible outlines (coral), focus management
 - Keyboard navigation for all interactive elements
@@ -81,11 +81,10 @@ SniffShift is a **conceptual enrichment station** with a proposed three-stage se
 │  Backend (Serverless Functions)                             │
 │  ├── POST /api/order      — Create order (idempotent)       │
 │  ├── GET  /api/order/[id] — Retrieve order (no PII leak)   │
-│  └── Vercel Blob storage  — Atomic JSON writes, concurrency │
+│  └── Vercel Blob storage  — Check-then-write, concurrency  │
 ├─────────────────────────────────────────────────────────────┤
 │  Infrastructure                                             │
 │  ├── Vercel (edge deployment, zero config)                 │
-│  ├── GitHub Actions (lint, typecheck, build on push)       │
 │  └── CDP-based browser tests (desktop + mobile viewports)  │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -105,32 +104,31 @@ SniffShift is a **conceptual enrichment station** with a proposed three-stage se
 
 ### Prerequisites
 - Node.js 22+
-- pnpm (or npm/yarn)
+- npm (or yarn/pnpm)
 
 ### Setup
 ```bash
 # Clone & install
 git clone https://github.com/Naman-the-Ace/23ume535-hwa-hackathon.git
 cd 23ume535-hwa-hackathon
-pnpm install
+npm install
 
 # Generate product assets (optional — already committed)
-pnpm --filter=scripts run generate-images
+node scripts/generate-product-images.mjs
 
 # Start dev server
-pnpm dev
+npm run dev
 ```
 
 Open http://localhost:3000
 
 ### Available Scripts
 ```bash
-pnpm dev          # Development server (Turbopack)
-pnpm build        # Production build
-pnpm start        # Production server
-pnpm lint         # ESLint (zero errors required)
-pnpm typecheck    # TypeScript --noEmit
-pnpm test:e2e     # CDP browser tests (requires Chrome on port 9333)
+npm run dev          # Development server (Turbopack)
+npm run build        # Production build
+npm run start        # Production server
+npm run lint         # ESLint (zero errors required)
+npm run typecheck    # TypeScript --noEmit
 ```
 
 ### Generate Product Assets
@@ -146,7 +144,7 @@ node scripts/generate-product-images.mjs
 
 1. **Landing** → Hero with 3D tilt interaction, CTA to product
 2. **Product Page** → 5-image gallery, select size/quantity, "Add to Demo Order"
-3. **Cart** → Review items, see tax (8%) + free shipping, "Proceed to Demo Checkout"
+3. **Cart** → Review items, see tax (8%) + free shipping, "Proceed to Checkout"
 4. **Checkout** → Fill 8-field form, "Place Demo Order"
 5. **Confirmation** → Order ID `SS-YYYYMMDD-XXXXXXXX`, order number `SNIF-XXXXXXXX`
 6. **Refresh** → Order persists (localStorage cart + server order record)
@@ -165,7 +163,7 @@ node scripts/generate-product-images.mjs
 | **Local API** | `POST /api/order` returns 500 on localhost (Vercel Blob OIDC requires deployed environment) — works in production |
 | **Single Product** | Only one SKU (`sniffshift-original`) with three size variants |
 | **No Auth** | Demo checkout uses sessionStorage idempotency keys, no user accounts |
-| **Blob Concurrency** | Vercel Blob has no native transactions — uses idempotency keys + conditional writes |
+| **Blob Concurrency** | Vercel Blob has no native transactions — uses idempotency keys + check-then-write |
 | **Images** | All product visuals are **AI-generated concept illustrations** (SVG → sharp → AVIF/WebP), not photographs |
 
 ---
@@ -206,9 +204,9 @@ node scripts/generate-product-images.mjs
 
 ## Quality Checklist (Pre-Deploy)
 
-- [x] `pnpm lint` — 0 errors
-- [x] `pnpm typecheck` — 0 errors
-- [x] `pnpm build` — Successful production build
+- [x] `npm run lint` — 0 errors
+- [x] `npm run typecheck` — 0 errors
+- [x] `npm run build` — Successful production build
 - [x] Desktop browser tests (1440px) — 17/18 pass (1 expected local API 500)
 - [x] Mobile browser tests (390px) — 19/20 pass (1 expected local API 500)
 - [x] Viewports verified: 360, 390, 768, 1440px
@@ -230,7 +228,7 @@ node scripts/generate-product-images.mjs
 git push origin main
 
 # Or manual production deploy
-pnpm build && vercel --prod
+npm run build && vercel --prod
 ```
 
 **Production URL:** https://23ume535-hwa-hackathon.vercel.app

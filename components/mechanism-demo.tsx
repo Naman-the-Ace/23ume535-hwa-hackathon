@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef, KeyboardEvent } from "react";
+import { useState, useCallback, useEffect, useRef, KeyboardEvent, MouseEvent, TouchEvent } from "react";
 
 type Stage = "sniff" | "shift" | "wait" | "complete";
 
@@ -98,6 +98,28 @@ export function MechanismDemo() {
     [stage, slider1Pos, slider2Pos, handleSliderChange]
   );
 
+  const handleScentChamberClick = useCallback(
+    (e: MouseEvent<HTMLDivElement> | TouchEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      if (stage === "sniff") {
+        setStage("shift");
+      }
+    },
+    []
+  );
+
+  const handleScentChamberKeyDown = useCallback(
+    (e: KeyboardEvent<HTMLDivElement>) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        if (stage === "sniff") {
+          setStage("shift");
+        }
+      }
+    },
+    []
+  );
+
   const reset = useCallback(() => {
     setStage("sniff");
     setSlider1Pos(0);
@@ -110,7 +132,7 @@ export function MechanismDemo() {
   const replay = useCallback(() => {
     reset();
     setTimeout(() => setStage("sniff"), 100);
-  }, [reset]);
+  }, []);
 
   const currentStageIndex = ["sniff", "shift", "wait"].indexOf(stage);
   const isComplete = stage === "complete";
@@ -127,7 +149,7 @@ export function MechanismDemo() {
             Interactive Mechanism Demo
           </h2>
           <p className="text-sage-dark text-lg max-w-2xl mx-auto mb-6">
-            Experience the proposed three-stage sequence. Use the sliders to align the mechanism,
+            Experience the proposed three-stage sequence. Click the scent chamber to begin, then use the sliders to align the mechanism,
             then watch the treat release. Keyboard accessible — use Arrow keys, Home, End.
           </p>
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-sage/20 text-sage-dark border border-sage/30">
@@ -184,7 +206,7 @@ export function MechanismDemo() {
                     </svg>
                   </div>
 
-                  <div className="flex-1 max-w-xs">
+                  <div className="flex-1 max-w-xs relative">
                     <label htmlFor="slider-1" className="sr-only">Slider 1 - Left alignment</label>
                     <input
                       id="slider-1"
@@ -209,7 +231,7 @@ export function MechanismDemo() {
                     </svg>
                   </div>
 
-                  <div className="flex-1 max-w-xs">
+                  <div className="flex-1 max-w-xs relative">
                     <label htmlFor="slider-2" className="sr-only">Slider 2 - Right alignment</label>
                     <input
                       id="slider-2"
@@ -235,14 +257,42 @@ export function MechanismDemo() {
                   </div>
                 </div>
 
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 flex gap-2 pointer-events-none" aria-hidden="true">
-                  {scentWaves.map((_, i) => (
-                    <div
-                      key={i}
-                      className={`w-3 h-3 rounded-full border-2 border-coral/50 ${reducedMotion ? "opacity-0" : "animate-pulse"}`}
-                      style={{ animationDelay: `${i * 300}ms` }}
-                    />
-                  ))}
+                <div
+                  className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 flex gap-2 pointer-events-none"
+                  aria-hidden="true"
+                  role="button"
+                  tabIndex={0}
+                  onClick={handleScentChamberClick}
+                  onKeyDown={handleScentChamberKeyDown}
+                  onTouchStart={handleScentChamberClick}
+                  aria-label="Scent chamber - click to start the mechanism"
+                  aria-pressed={stage !== "sniff"}
+                >
+                  <div
+                    className={`w-16 h-16 rounded-full bg-gradient-to-br from-coral to-coral-light border-4 border-coral/30 relative transition-all duration-300 ${stage === "sniff" ? "animate-pulse" : "scale-95"}`}
+                    style={{ transform: stage === "sniff" ? "scale(1)" : "scale(0.9)" }}
+                  >
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <svg className="w-8 h-8 text-white/90" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2H15a2.5 2.5 0 002.5-2.5V3.935M8 3.935c0-.61.825-1.106 1.485-1.188.108-.014.217-.014.325 0C9.825 2.829 10.65 3.325 10.65 3.935V5.5" />
+                      </svg>
+                    </div>
+                    {stage === "sniff" && (
+                      <div className="absolute -top-2 -right-2 w-5 h-5 bg-coral rounded-full flex items-center justify-center animate-bounce">
+                        <span className="text-xs text-white font-bold">1</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 flex gap-2 pointer-events-none" aria-hidden="true">
+                    {scentWaves.map((_, i) => (
+                      <div
+                        key={i}
+                        className={`w-3 h-3 rounded-full border-2 border-coral/50 ${reducedMotion ? "opacity-0" : "animate-pulse"}`}
+                        style={{ animationDelay: `${i * 300}ms` }}
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
 
@@ -272,7 +322,7 @@ export function MechanismDemo() {
 
                   <div className="mt-6 text-center">
                     <p className="text-sm text-sage-dark font-medium" aria-live="polite">
-                      {stage === "sniff" && "Sniff the scent chamber to locate the treat"}
+                      {stage === "sniff" && "Click the scent chamber to locate the treat"}
                       {stage === "shift" && "Align both sliders to open the release path"}
                       {stage === "wait" && "Wait for the timed gate to open..."}
                       {isComplete && "Treat released! The delayed-access sequence is complete."}
